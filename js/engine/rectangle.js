@@ -10,6 +10,21 @@ class Rectangle {
         this.update(0, 0);
     }
 
+    get centerX() {
+        return this.left + this.width / 2;
+    }
+
+    get centerY() {
+        return this.top + this.height / 2;
+    }
+
+    clone() {
+        let clone = new Rectangle(this.width, this.height, this.scale);
+        clone.update(this.left, this.top);
+
+        return clone;
+    }
+
     update(left, top) {
         this.left = left;
         this.top = top;
@@ -27,7 +42,7 @@ class Rectangle {
     /**
      * For debugging
      */
-    drawCollisionBorder(engine) {
+    drawCollisionBorder() {
         let left = this.left + this.horizontalOffset;
         let top = this.top + this.verticalOffset;
         let right = this.right - this.horizontalOffset;
@@ -35,8 +50,4 @@ class Rectangle {
 
         engine.stroke(left, top, right, bottom);
     }
-}
-
-function getRandomInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
 }

@@ -1,42 +1,18 @@
-class RenderedObject {
-    constructor(engine) {
-        this.engine = engine;
-    }
-
-    render() {
-    }
-}
-
-class RenderedText extends RenderedObject {
-    constructor(engine, text, x, y, {font, fillStyle, textAlign}) {
-        super(engine);
-        this.text = text;
-        this.x = x;
-        this.y = y;
-        this.textStyle = {font, fillStyle, textAlign};
-    }
-
-    render() {
-        this.engine.fillText(this.text, this.x, this.y, this.textStyle);
-    }
-}
-
 /**
  * Class provides the game gameLoop functionality (update and render game objects).
  * Class provides some utility methods to draw smth on canvas like #strokeText(...) and #showDialog(...)
  */
 class Engine {
-    constructor(game) {
-        this.game = game;
-        game.setEngine(this);
-
+    constructor() {
         this.canvas = document.createElement('canvas');
         this.ctx = this.canvas.getContext('2d');
         this.canvas.width = 505;
         this.canvas.height = 606;
         document.body.appendChild(this.canvas);
+    }
 
-        this.renderedObjects = [];
+    getCanvasContext() {
+        return this.ctx;
     }
 
     /**
@@ -64,6 +40,7 @@ class Engine {
         }
 
         const now = Date.now();
+        // todo why in seconds? try milliseconds
         const dt = (now - this.lastTime) / 1000.0;
 
         this.update(dt);
@@ -82,7 +59,7 @@ class Engine {
      * @see #gameLoop()
      */
     update(dt) {
-        this.game.update(dt);
+        game.update(dt);
     }
 
     /**
@@ -93,8 +70,8 @@ class Engine {
      * @see #gameLoop()
      */
     render() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.game.render();
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        game.render();
     }
 
     /**
@@ -102,11 +79,11 @@ class Engine {
      * Parameters text, x, y are required
      */
     strokeText(text, x, y, {font = '24px Arial', strokeStyle = '#FFFFFF', lineWidth = 3, textAlign = 'left'} = {}) {
-        this.ctx.font = font;
-        this.ctx.strokeStyle = strokeStyle;
-        this.ctx.lineWidth = lineWidth;
-        this.ctx.textAlign = textAlign;
-        this.ctx.strokeText(text, x, y);
+        ctx.font = font;
+        ctx.strokeStyle = strokeStyle;
+        ctx.lineWidth = lineWidth;
+        ctx.textAlign = textAlign;
+        ctx.strokeText(text, x, y);
     }
 
     /**
@@ -114,10 +91,10 @@ class Engine {
      * Parameters text, x, y are required
      */
     fillText(text, x, y, {font = '24px Arial', fillStyle = '#000000', textAlign = 'left'} = {}) {
-        this.ctx.font = font;
-        this.ctx.fillStyle = fillStyle;
-        this.ctx.textAlign = textAlign;
-        this.ctx.fillText(text, x, y);
+        ctx.font = font;
+        ctx.fillStyle = fillStyle;
+        ctx.textAlign = textAlign;
+        ctx.fillText(text, x, y);
     }
 
     /**
@@ -138,16 +115,16 @@ class Engine {
      * Draw border rectangle
      */
     stroke(left, top, right, bottom, {strokeStyle = '#000000', lineWidth = 1} = {}) {
-        this.ctx.strokeStyle = strokeStyle;
-        this.ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = strokeStyle;
+        ctx.lineWidth = lineWidth;
 
-        this.ctx.beginPath();
-        this.ctx.moveTo(left, top);
-        this.ctx.lineTo(right, top);
-        this.ctx.lineTo(right, bottom);
-        this.ctx.lineTo(left, bottom);
-        this.ctx.closePath();
-        this.ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(left, top);
+        ctx.lineTo(right, top);
+        ctx.lineTo(right, bottom);
+        ctx.lineTo(left, bottom);
+        ctx.closePath();
+        ctx.stroke();
     }
 
     /**
@@ -165,8 +142,8 @@ class Engine {
         let hCenter = left + width / 2;
         let vCenter = top + height / 2;
 
-        this.ctx.fillStyle = 'rgba(27, 27, 27, 0.8)';
-        this.ctx.fillRect(left, top, width, height);
+        ctx.fillStyle = 'rgba(27, 27, 27, 0.8)';
+        ctx.fillRect(left, top, width, height);
 
         this.fillText(title.toUpperCase(), hCenter, vCenter - 30,
             {font: '40px Arial', fillStyle: '#FEFC36', textAlign: 'center'});

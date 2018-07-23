@@ -1,6 +1,5 @@
 class Player {
-    constructor(game, collisionRectScale) {
-        this.game = game;
+    constructor(collisionRectScale) {
         this.rect = new Rectangle(80, 90, collisionRectScale);
 
         this.spriteNormal = 'img/char_boy.png';
@@ -13,6 +12,10 @@ class Player {
         this.reset();
     }
 
+    setAnimation(animation) {
+        this.animation = animation;
+    }
+
     /**
      * Reset player to default state
      */
@@ -21,11 +24,13 @@ class Player {
         this.lives = 3;
         this.sprite = this.spriteNormal;
         this.livesTextStrokeColor = this.colorWhite;
+        this.animation = null;
     }
 
     /**
      * Reset player position
      */
+    // todo row, col
     resetPosition() {
         this.row = 5;
         this.col = 2;
@@ -40,41 +45,54 @@ class Player {
      * @param dt a time delta between game ticks
      */
     update(dt) {
+        let yOffset = 0;
+        if (this.animation != null) {
+            yOffset = this.animation.update(dt);
+        }
+
         let x = 101 * this.col + (101 - this.rect.width) / 2;
-        let y = (171 / 2) * this.row + this.rect.height / 2 - 10;
+        let y = (171 / 2) * this.row + this.rect.height / 2 - 10 + yOffset;
 
         this.rect.update(x, y);
+    }
+
+    // get new cloned rect with new updated position
+    getUpdatedRect() {
+        let rect = this.rect.clone();
+        let x = 101 * this.col + (101 - this.rect.width) / 2;
+        let y = (171 / 2) * this.row + this.rect.height / 2 - 10;
+        rect.update(x, y);
+
+        return rect;
     }
 
     /**
      * Draw on the screen using canvas
      */
     render() {
-        const ctx = this.game.engine.ctx;
         ctx.drawImage(res.get(this.sprite), this.rect.left, this.rect.top);
-        this.rect.drawCollisionBorder(this.game.engine);
+        // this.rect.drawCollisionBorder();
     }
 
     /**
-     * Loose life
+     * Loose life.
+     * Change sprite.
+     * Set pause for 0.2 sec.
+     * After timeout reset to default state
      */
-    // change sprite
-    // set pause with timeout
-    // after timeout set sprites to normal
-    // run in default state
     looseLife() {
         this.lives--;
         this.sprite = this.spriteSad;
         this.livesTextStrokeColor = this.colorYellow;
-        this.game.setPause(true);
+        game.setPause(true);
 
         setTimeout(() => {
             if (this.lives <= 0) {
-                this.game.gameLost = true;
+                game.gameLost = true;
             } else {
                 this.resetPosition();
             }
-            this.game.setPause(false);
+            game.setPause(false);
         }, 200);
     }
 }

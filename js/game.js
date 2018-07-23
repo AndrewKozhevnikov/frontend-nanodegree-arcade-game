@@ -1,13 +1,22 @@
 class Game {
     constructor() {
-        this.allLevels = [new Level_1(this), new Level_2(this)];
-        this.player = new Player(this, 0.6);
+        // this.allLevels = [
+        //     new Level_1(this),
+        //     new Level_2(this),
+        //     new Level_3(this),
+        //     new Level_4(this)
+        // ];
+
+        this.allLevels = [
+            new Level_5(this)
+        ];
+
+        this.player = new Player(0.6);
         document.addEventListener('keyup', event => this.handleInput(event.keyCode));
         this.reset();
-    }
 
-    setEngine(engine) {
-        this.engine = engine;
+        this.renderObjects = [];
+        // staticRenderObjects or gameStateObjects
     }
 
     reset() {
@@ -22,6 +31,9 @@ class Game {
         this.paused = false;
 
         this.player.reset();
+
+        // todo remove
+        this.messages = [];
     }
 
     resetPositions() {
@@ -52,47 +64,64 @@ class Game {
     }
 
     renderScore() {
-        this.engine.strokeAndFillText('Score: ' + this.score, 20, 90,
+        engine.strokeAndFillText('Score: ' + this.score, 20, 90,
             {font: 'bold 24px Arial', fillStyle: '#FEFC36', strokeStyle: '#000000'});
     }
 
     renderLvlText() {
-        this.engine.strokeAndFillText('Lvl: ' + this.lvl, this.engine.canvas.width - 20, 90,
+        engine.strokeAndFillText('Lvl: ' + this.lvl, engine.canvas.width - 20, 90,
             {font: 'bold 24px Arial', fillStyle: '#FEFC36', strokeStyle: '#000000', textAlign: 'right'});
     }
 
     renderHealthBar() {
         let strokeColor = this.player.livesTextStrokeColor;
-        this.engine.ctx.drawImage(res.get('img/heart_mini.png'), 20, this.engine.canvas.height - 68);
-        this.engine.strokeAndFillText('x ' + this.player.lives, 60, this.engine.canvas.height - 45,
+        ctx.drawImage(res.get('img/heart_mini.png'), 20, engine.canvas.height - 68);
+        engine.strokeAndFillText('x ' + this.player.lives, 60, engine.canvas.height - 45,
             {fillStyle: '#000000', strokeStyle: strokeColor, lineWidth: 4});
     }
 
     renderBottomMessage() {
-        this.engine.fillText('Press \'p\' to pause or resume', this.engine.canvas.width - 10, this.engine.canvas.height - 45,
+        engine.fillText('Press \'p\' to pause or resume', engine.canvas.width - 10, engine.canvas.height - 45,
             {font: '18px Arial', fillStyle: '#FFFFFF', textAlign: 'right'});
     }
 
     renderAdditionalObjects() {
-        this.renderedObjects.forEach(obj => obj.render());
+        this.renderObjects.forEach(obj => obj.render());
     }
 
-    addRenderedObject(obj) {
-        this.renderedObjects.push(obj);
+    addRenderObject(obj) {
+        this.renderObjects.push(obj);
     }
 
-    removeRenderedObject(obj) {
-        let index = this.renderedObjects.indexOf(obj);
-        if (index !== -1) this.renderedObjects.splice(index, 1);
+    removeRenderObject(obj) {
+        this.renderObjects.remove(obj);
     }
 
-    showFloatingText(text, x, y, {font = '24px Arial', fillStyle = '#000000', textAlign = 'left'} = {}) {
-        const obj = new RenderedText(this, text, x, y, {font, fillStyle, textAlign});
-        this.addRenderedObject(obj);
+    showBonusText(text, x, y, {font = 'bold 18px Arial', fillStyle = '#321156', textAlign = 'center'} = {}) {
+        const bonusTextObj = new RenderText(text, x, y, {font, fillStyle, textAlign});
+        bonusTextObj.setAnimation(new SlideUpAnimation());
+        this.addRenderObject(bonusTextObj);
 
         setTimeout(() => {
-            this.removeRenderedObject(obj);
-        }, 5000);
+            this.removeRenderObject(bonusTextObj);
+        }, 400);
+    }
+
+    showScroll(x, y) {
+        const scroll = new RenderImage('img/scroll.png', x, y);
+        this.addRenderObject(scroll);
+        this.messages.push(scroll);
+
+        setTimeout(() => {
+
+            let fadeOutTime = 1000;
+            scroll.setAnimation(new FadeOutAnimation(fadeOutTime));
+            setTimeout(() => {
+                this.messages.remove(scroll);
+                this.removeRenderObject(scroll);
+            }, fadeOutTime);
+
+        }, 3000);
     }
 
     /**
@@ -104,10 +133,16 @@ class Game {
         this.currentLevel.update(dt);
         this.player.update(dt);
 
+        this.updateAdditionalObjects(dt);
+
         if (this.currentLevel.collideWithEnemy(this.player.rect) &&
             (!this.paused && !this.gameLost && !this.gameWon)) {
             this.player.looseLife();
         }
+    }
+
+    updateAdditionalObjects(dt) {
+        this.renderObjects.forEach(obj => obj.update(dt));
     }
 
     winLevel() {
@@ -118,18 +153,26 @@ class Game {
         } else {
             this.lvl++;
             this.currentLevel = this.allLevels[this.lvl - 1];
+
+            if (this.currentLevel.isWaterLevel()) {
+                let animation = new SlideUpDownAnimation(-10, 10, 20);
+                this.player.setAnimation(animation);
+            } else {
+                this.player.setAnimation(null);
+            }
+
             this.resetPositions();
         }
     }
 
     win() {
         this.setPause(true);
-        this.engine.showDialog('You Did It!', 'Press \'Enter\' to Play Again');
+        engine.showDialog('You Did It!', 'Press \'Enter\' to Play Again');
     }
 
     loose() {
         this.setPause(true);
-        this.engine.showDialog('Game Over!', 'Press \'Enter\' to Play Again');
+        engine.showDialog('Game Over!', 'Press \'Enter\' to Play Again');
     }
 
     /**
@@ -137,7 +180,7 @@ class Game {
      */
     setPause(pause) {
         this.paused = pause;
-        this.paused ? this.engine.stop() : this.engine.start();
+        this.paused ? engine.stop() : engine.start();
     }
 
     /**
@@ -155,13 +198,13 @@ class Game {
             case 'pause':
                 if (!this.gameLost && !this.gameWon) {
                     this.setPause(!this.paused);
-                    this.engine.showDialog('Pause', 'Press \'p\' to resume');
+                    engine.showDialog('Pause', 'Press \'p\' to resume');
                 }
                 break;
             case 'enter':
                 if (this.gameLost || this.gameWon) {
                     this.reset();
-                    this.engine.start();
+                    engine.start();
                 }
                 break;
             default:
@@ -178,6 +221,11 @@ class Game {
             39: 'right',
             40: 'down'
         };
+
+        // todo refactor names and both arrays
+        if (this.messages.length > 0) {
+            this.removeRenderObject(this.messages.pop());
+        }
 
         let row = this.player.row;
         let col = this.player.col;
@@ -197,7 +245,9 @@ class Game {
                 if ((row - 1 >= 0) && this.currentLevel.canPass(row - 1, col)) {
                     this.player.row--;
                 }
-                if (this.player.row === 0) this.winLevel(); // todo change to level's method
+                if (this.player.row === 0 && this.currentLevel.canWinLevel()) {
+                    this.winLevel();
+                }
                 break;
             case 'down':
                 if ((row + 1 <= 5) && this.currentLevel.canPass(row + 1, col)) {
@@ -210,7 +260,18 @@ class Game {
             let bonus = this.currentLevel.collectItem(this.player.row, this.player.col);
             this.score += bonus.bonusScore;
             this.player.lives += bonus.bonusLives;
-            this.engine.showFloatingText(bonus.getBonusText(), this.player.rect.left, this.player.rect.top);
+
+            let rect = this.player.getUpdatedRect();
+            this.showBonusText(bonus.getBonusText(), rect.centerX, rect.top);
+
+            if (bonus instanceof ScrollBonus) {
+                this.showScroll(rect.right + 10, rect.top - rect.height);
+            }
         }
     }
 }
+
+// todo bugs jump
+// gem glows
+// heartbeat
+// player water foreground
