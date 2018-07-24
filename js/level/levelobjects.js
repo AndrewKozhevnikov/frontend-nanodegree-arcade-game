@@ -1,27 +1,9 @@
-class LevelObject {
-    constructor(sprite, passable, collectible, bonus, animation) {
-        this.sprite = sprite;
+class LevelObject extends RenderedImage {
+    constructor(sprite, passable, collectible, bonus) {
+        super(sprite);
         this.passable = passable;
         this.collectible = collectible;
         this.bonus = bonus;
-        this.animation = animation;
-        this.yOffset = 0;
-    }
-
-    setYOffset(yOffset) {
-        this.yOffset = yOffset;
-    }
-
-    render(row, col) {
-        if (this.sprite != null) {
-            ctx.drawImage(res.get(this.sprite), col * 101, 83 + (row * 83) - 30 + this.yOffset);
-        }
-    }
-
-    update(dt) {
-        if (this.animation != null) {
-            this.yOffset = this.animation.update(dt);
-        }
     }
 }
 

@@ -1,14 +1,15 @@
 class Game {
     constructor() {
         // this.allLevels = [
-        //     new Level_1(this),
-        //     new Level_2(this),
-        //     new Level_3(this),
-        //     new Level_4(this)
+        //     new Level_1(),
+        //     new Level_2(),
+        //     new Level_3(),
+        //     new Level_4(),
+        //     new Level_5()
         // ];
 
         this.allLevels = [
-            new Level_5(this)
+            new Level_4()
         ];
 
         this.player = new Player(0.6);
@@ -98,7 +99,7 @@ class Game {
     }
 
     showBonusText(text, x, y, {font = 'bold 18px Arial', fillStyle = '#321156', textAlign = 'center'} = {}) {
-        const bonusTextObj = new RenderText(text, x, y, {font, fillStyle, textAlign});
+        const bonusTextObj = new RenderedText(text, x, y, {font, fillStyle, textAlign});
         bonusTextObj.setAnimation(new SlideUpAnimation());
         this.addRenderObject(bonusTextObj);
 
@@ -108,7 +109,7 @@ class Game {
     }
 
     showScroll(x, y) {
-        const scroll = new RenderImage('img/scroll.png', x, y);
+        const scroll = new RenderedImage('img/scroll.png', x, y);
         this.addRenderObject(scroll);
         this.messages.push(scroll);
 
@@ -275,3 +276,7 @@ class Game {
 // gem glows
 // heartbeat
 // player water foreground
+
+// dt /1000
+// for for init level obj coord
+// colliderect

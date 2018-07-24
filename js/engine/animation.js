@@ -12,7 +12,7 @@ class SlideUpAnimation {
 }
 
 class SlideUpDownAnimation {
-    constructor(minYOffset = -5, maxYOffset = 5, movement = 10) {
+    constructor(minYOffset = -8, maxYOffset = 8, movement = 15) {
         this.offset = 0;
         this.minOffset = minYOffset;
         this.maxOffset = maxYOffset;
@@ -30,14 +30,14 @@ class SlideUpDownAnimation {
         // todo rename movement
         this.offset = this.offset + this.movement * dt * this.direction;
 
-        return this.offset;
+        return this.movement * dt * this.direction;
     }
 }
 
 class FadeOutAnimation {
     constructor(time) {
         this.time = time;
-        this.fromAlpha = 1.0 * 1000; // 1000 because of dt from engine. why to divide by 1000?
+        this.fromAlpha = 1.0 * 1000; // 1000 because of dt from engine.
     }
 
     update(dt) {

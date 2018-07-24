@@ -40,7 +40,6 @@ class Engine {
         }
 
         const now = Date.now();
-        // todo why in seconds? try milliseconds
         const dt = (now - this.lastTime) / 1000.0;
 
         this.update(dt);

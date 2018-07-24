@@ -1,10 +1,14 @@
-class RenderObject {
+class RenderedObject {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
+        this.setCoordinates(x, y);
         this.alpha = 1;
         this.yOffset = 0;
         this.alphaOffset = 0;
+    }
+
+    setCoordinates(x, y) {
+        this.x = x;
+        this.y = y;
     }
 
     setAnimation(animation) {
@@ -40,7 +44,7 @@ class RenderObject {
     }
 }
 
-class RenderText extends RenderObject {
+class RenderedText extends RenderedObject {
     constructor(text, x, y, {font, fillStyle, textAlign}) {
         super(x, y);
         this.text = text;
@@ -57,17 +61,21 @@ class RenderText extends RenderObject {
     }
 }
 
-class RenderShadowText extends RenderText {
+class RenderedShadowText extends RenderedText {
 
 }
 
-class RenderImage extends RenderObject {
+class RenderedImage extends RenderedObject {
     constructor(sprite, x, y){
         super(x, y);
         this.sprite = sprite;
     }
 
     render() {
+        if (this.sprite == null) {
+            return;
+        }
+
         if (this.alphaOffset !== 0) {
             this.renderWithAlpha();
         } else {

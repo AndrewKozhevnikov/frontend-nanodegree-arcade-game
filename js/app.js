@@ -3,12 +3,18 @@ Array.prototype.remove = function (element) {
     return this;
 };
 
-const res = new Resources();
-const game = new Game();
-const engine = new Engine(game);
-const ctx = engine.getCanvasContext();
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-res.addOnImagesLoadedCallback(() => engine.start());
+const res = new Resources();
+res.addOnImagesLoadedCallback(() => {
+    this.engine = new Engine();
+    this.ctx = engine.getCanvasContext();
+    this.game = new Game();
+
+    engine.start();
+});
 
 res.load([
     'img/background.gif',
