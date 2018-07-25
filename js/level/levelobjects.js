@@ -1,6 +1,23 @@
+// Just an empty, not passable object with no functionality at all
+class EmptyBarrier {
+    constructor() {
+        this.passable = false;
+        this.collectible = false;
+    }
+
+    update(dt) {
+    }
+
+    render() {
+    }
+
+    setCoordinates(x, y) {
+    }
+}
+
 class LevelObject extends RenderedImage {
-    constructor(sprite, passable, collectible, bonus) {
-        super(sprite);
+    constructor(imageUrl, passable, collectible, bonus) {
+        super(imageUrl);
         this.passable = passable;
         this.collectible = collectible;
         this.bonus = bonus;

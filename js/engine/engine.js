@@ -6,8 +6,8 @@ class Engine {
     constructor() {
         this.canvas = document.createElement('canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.canvas.width = 505;
-        this.canvas.height = 606;
+        this.canvas.width = canvasWidth;
+        this.canvas.height = canvasHeight;
         document.body.appendChild(this.canvas);
     }
 
@@ -69,7 +69,7 @@ class Engine {
      * @see #gameLoop()
      */
     render() {
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         game.render();
     }
 
@@ -77,7 +77,7 @@ class Engine {
      * Utility method with some default parameters.
      * Parameters text, x, y are required
      */
-    strokeText(text, x, y, {font = '24px Arial', strokeStyle = '#FFFFFF', lineWidth = 3, textAlign = 'left'} = {}) {
+    strokeText(text, x, y, {font = '24px Arial', strokeStyle = '#FFFFFF', lineWidth = 3, textAlign = 'x'} = {}) {
         ctx.font = font;
         ctx.strokeStyle = strokeStyle;
         ctx.lineWidth = lineWidth;
@@ -89,7 +89,7 @@ class Engine {
      * Utility method with some default parameters.
      * Parameters text, x, y are required
      */
-    fillText(text, x, y, {font = '24px Arial', fillStyle = '#000000', textAlign = 'left'} = {}) {
+    fillText(text, x, y, {font = '24px Arial', fillStyle = '#000000', textAlign = 'x'} = {}) {
         ctx.font = font;
         ctx.fillStyle = fillStyle;
         ctx.textAlign = textAlign;
@@ -136,8 +136,8 @@ class Engine {
     showDialog(title, msg) {
         let width = 350;
         let height = 200;
-        let left = (this.canvas.width - width) / 2;
-        let top = (this.canvas.height - height) / 2;
+        let left = (canvasWidth - width) / 2;
+        let top = (canvasHeight - height) / 2;
         let hCenter = left + width / 2;
         let vCenter = top + height / 2;
 

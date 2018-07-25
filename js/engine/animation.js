@@ -1,37 +1,64 @@
-/**
- * interchanggable
- */
-class SlideUpAnimation {
-    constructor(movement = 150) {
-        this.movement = movement;
+class Animation {
+    constructor(speed = 150) {
+        this.setSpeed(speed);
     }
 
-    update(dt) {
-        return -this.movement * dt;
+    setSpeed(speed) {
+        this.speed = speed;
     }
 }
 
-class SlideUpDownAnimation {
-    constructor(minYOffset = -8, maxYOffset = 8, movement = 15) {
+class MoveAnimation extends Animation {
+    update(dt) {
+        return this.speed * dt;
+    }
+}
+
+class MoveBackAnimation extends MoveAnimation {
+    update(dt) {
+        return -super.update(dt);
+    }
+}
+
+class ForwardAndBackAnimation extends Animation {
+    constructor(speed = 15, min = -8, max = 8, objectWidth = 0) {
+        super(speed);
         this.offset = 0;
-        this.minOffset = minYOffset;
-        this.maxOffset = maxYOffset;
-        this.movement = movement;
+        this.min = min;
+        this.max = max;
         this.direction = 1;
+        this.objectWidth = objectWidth;
     }
 
     update(dt) {
-        if (this.offset <= this.minOffset) {
+        if (this.offset <= this.min) {
             this.direction = 1;
-        } else if (this.offset >= this.maxOffset) {
-            this.direction = -1
+        } else if (this.offset + this.objectWidth >= this.max) {
+            this.direction = -1;
         }
 
-        // todo rename movement
-        this.offset = this.offset + this.movement * dt * this.direction;
+        this.offset = this.offset + this.speed * dt * this.direction;
 
-        return this.movement * dt * this.direction;
+        return this.speed * dt * this.direction;
     }
+}
+
+class MoveUpAnimation extends MoveBackAnimation {
+}
+
+class MoveDownAnimation extends MoveAnimation {
+}
+
+class MoveLeftAnimation extends MoveBackAnimation {
+}
+
+class MoveRightAnimation extends MoveAnimation {
+}
+
+class MoveUpDownAnimation extends ForwardAndBackAnimation {
+}
+
+class MoveLeftRightAnimation extends ForwardAndBackAnimation {
 }
 
 class FadeOutAnimation {

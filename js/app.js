@@ -9,6 +9,22 @@ function random(min, max) {
 
 const res = new Resources();
 res.addOnImagesLoadedCallback(() => {
+    // make some global variables to make access to them more comfortable
+    this.canvasWidth = 505;
+    this.canvasHeight = 606;
+
+    this.cols = 5;
+    this.rows = 6; // ?
+
+    this.transparentPartOfTileImage = 50;
+    this.undergroundPartOfTileImage = 50;
+
+    this.colWidth = 101;
+    this.rowHeight = (this.canvasHeight - transparentPartOfTileImage - undergroundPartOfTileImage) / rows;
+
+    this.nextRowVisibleTop = transparentPartOfTileImage + rowHeight;
+
+
     this.engine = new Engine();
     this.ctx = engine.getCanvasContext();
     this.game = new Game();
@@ -20,9 +36,9 @@ res.load([
     'img/background.gif',
     'img/background_scene_underwater.jpg',
 
-    'img/block_grass.png',
-    'img/block_stone.png',
-    'img/block_water.png',
+    'img/tile_grass.png',
+    'img/tile_stone.png',
+    'img/tile_water.png',
 
     'img/bottle.png',
 
@@ -41,6 +57,7 @@ res.load([
     'img/char_princess_girl.png',
 
     'img/enemy_bug.png',
+    'img/enemy_shark.png',
     'img/enemy_shark_fin.png',
     'img/enemy_shark_fin_revert.png',
 
