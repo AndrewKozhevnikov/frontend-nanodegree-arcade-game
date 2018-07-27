@@ -15,9 +15,18 @@ class EmptyBarrier {
     }
 }
 
-class LevelObject extends RenderedImage {
+class LevelObject extends ImageDrawable {
     constructor(imageUrl, passable, collectible, bonus) {
         super(imageUrl);
+        this.passable = passable;
+        this.collectible = collectible;
+        this.bonus = bonus;
+    }
+}
+
+class LayerLevelObject extends LayerDrawable {
+    constructor(drawables, passable, collectible, bonus) {
+        super(drawables);
         this.passable = passable;
         this.collectible = collectible;
         this.bonus = bonus;

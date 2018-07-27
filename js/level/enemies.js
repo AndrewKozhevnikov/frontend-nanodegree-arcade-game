@@ -18,13 +18,13 @@ class EnemyFactory {
  * @param collisionRectScale parameter to make enemy's/player's collision rect smaller.
  *  Used to make enemies smaller and to make game play more comfortable.
  */
-class Enemy extends RenderedImage {
+class Enemy extends ImageDrawable {
     constructor(imageUrl, x, y) {
         super(imageUrl, x, y);
-        // this.minSpeed = 300;
-        // this.maxSpeed = 500;
-        this.minSpeed = 100;
-        this.maxSpeed = 200;
+        // this.minSpeed = 200;
+        // this.maxSpeed = 400;
+        this.minSpeed = 150;
+        this.maxSpeed = 300;
     }
 
     /**
@@ -58,6 +58,28 @@ class BugEnemy extends Enemy {
     constructor(x, y) {
         super('img/enemy_bug.png', x, y);
         this.setAnimation(new MoveRightAnimation(random(this.minSpeed, this.maxSpeed)));
+    }
+
+    jump() {
+        this.beforeJumpY = this.y;
+        this.jumpAnimation = new JumpAnimation(this); // fixme  y - below beforeJumpY
+    }
+
+    isJumping() {
+        return this.jumpAnimation != null;
+    }
+
+    stopJumping() {
+        this.y = this.beforeJumpY;
+        this.jumpAnimation = null;
+    }
+
+    update(dt) {
+        if (this.jumpAnimation != null) {
+            this.applyAnimation(this.jumpAnimation, dt);
+        }
+
+        super.update(dt);
     }
 }
 

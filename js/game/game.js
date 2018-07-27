@@ -2,12 +2,14 @@ class Game {
     constructor() {
         document.addEventListener('keyup', event => this.handleInput(event.keyCode));
 
+        this.player = new Player();
+
         this.allLevels = [
-            // new Level_1(),
-            // new Level_2(),
-            // new Level_3(),
-            new Level_4()
-            // new Level_5()
+            // new Level_1(this.player),
+            // new Level_2(this.player),
+            // new Level_3(this.player),
+            new Level_4(this.player)
+            // new Level_5(this.player)
         ];
         this.currentLevel = this.allLevels[0];
 
@@ -20,8 +22,6 @@ class Game {
         ]);
 
         this.additionalRenderObjects = new Map();
-
-        this.player = new Player();
 
         this.gameLost = false;
         this.gameWon = false;
@@ -49,7 +49,7 @@ class Game {
         this.currentLevel = this.allLevels[lvl - 1];
 
         if (this.currentLevel.isWaterLevel()) {
-            this.player.setAnimation(new MoveUpDownAnimation(20, -10, 10));
+            this.player.setAnimation(new MoveUpDownAnimation(12, 0, 8));
         } else {
             this.player.setAnimation(null);
         }
@@ -153,7 +153,7 @@ class Game {
     }
 
     showBonusText(text, x, y) {
-        const bonusTextObj = new RenderedText(text, x, y, {font: 'bold 18px Arial', fillStyle: '#321156', textAlign: 'center'});
+        const bonusTextObj = new TextDrawable(text, x, y, {font: 'bold 18px Arial', fillStyle: '#321156', textAlign: 'center'});
         bonusTextObj.setAnimation(new MoveUpAnimation());
         this.additionalRenderObjects.set('bonusText', bonusTextObj);
 
@@ -163,7 +163,7 @@ class Game {
     }
 
     showScroll(x, y) {
-        const scroll = new RenderedImage('img/scroll.png', x, y);
+        const scroll = new ImageDrawable('img/scroll.png', x, y);
         this.additionalRenderObjects.set('scroll', scroll);
 
         setTimeout(() => {
@@ -267,14 +267,8 @@ class Game {
     }
 }
 
-// todo
+// todo next - level 5
 // choose player
-
-// bugs jump
-// gem glows
-// heartbeat
-
-// player water foreground
 
 // player underwater fall
 // player underwater bubbles
@@ -286,4 +280,6 @@ class Game {
 // all happy
 // flying hearts
 
-// unfinished: levels, reset, game stats precise positions
+// unfinished: levels, animation, reset, game stats precise positions, jump animation bug, scale animation do not scale
+//
+// level 4 -> draw enemy on foreground, help message

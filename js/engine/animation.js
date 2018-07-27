@@ -20,10 +20,43 @@ class MoveBackAnimation extends MoveAnimation {
     }
 }
 
+class JumpAnimation {
+    constructor(owner, duration = 900, speed = 80, min = -10, max = 0) {
+        // todo rename owner
+        this.owner = owner;
+        this.duration = duration;
+        this.startTime = Date.now();
+
+        this.speed = speed;
+        this.offset = 0;
+        this.min = min;
+        this.max = max;
+        this.direction = -1;
+    }
+
+    update(dt) {
+        let now = Date.now();
+        if (now >= this.startTime + this.duration) {
+            this.owner.stopJumping();
+        }
+
+        if (this.direction === 1 && this.offset >= this.max) {
+            return 0;
+        }
+
+        this.offset = this.offset + this.speed * dt * this.direction;
+        if (this.offset <= this.min) {
+            this.direction = 1;
+        }
+
+        return this.speed * dt * this.direction;
+    }
+}
+
 class ForwardAndBackAnimation extends Animation {
     constructor(speed = 15, min = -8, max = 8, objectWidth = 0) {
         super(speed);
-        this.offset = 0;
+        this.offset = min;
         this.min = min;
         this.max = max;
         this.direction = 1;
@@ -69,5 +102,28 @@ class FadeOutAnimation {
 
     update(dt) {
         return -(dt * this.fromAlpha / this.time);
+    }
+}
+
+class ScaleUpDownAnimation extends Animation {
+    constructor(speed = 2, min = 8, max = 10) {
+        super(speed);
+        this.offset = min;
+        this.min = min;
+        this.max = max;
+        this.direction = 1;
+    }
+
+    update(dt) {
+        if (this.offset <= this.min) {
+            this.direction = 1;
+        } else if (this.offset >= this.max) {
+            this.direction = -1;
+        }
+
+        this.offset = this.offset + this.speed * dt * this.direction;
+
+        // percent
+        return (this.max / 100) * this.offset;
     }
 }

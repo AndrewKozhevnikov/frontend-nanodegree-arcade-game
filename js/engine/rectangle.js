@@ -20,6 +20,10 @@ class CollisionRectangle {
     }
 
     collidesWith(rect2) {
+        if (rect2 == null) {
+            return false;
+        }
+
         return (this.x + this.horizontalOffset < rect2.right - rect2.horizontalOffset) &&
             (this.right - this.horizontalOffset > rect2.x + rect2.horizontalOffset) &&
             (this.y + this.verticalOffset < rect2.bottom - rect2.verticalOffset) &&

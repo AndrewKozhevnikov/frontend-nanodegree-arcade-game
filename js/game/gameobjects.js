@@ -1,4 +1,4 @@
-class ScoreText extends RenderedShadowText {
+class ScoreText extends ShadowTextDrawable {
     constructor() {
         super('Score: 0', 20, 90,
             {font: 'bold 24px Arial', fillStyle: '#FEFC36', strokeStyle: '#000000', lineWidth: 3, textAlign: 'left'});
@@ -16,7 +16,7 @@ class ScoreText extends RenderedShadowText {
     }
 }
 
-class LvlText extends RenderedShadowText {
+class LvlText extends ShadowTextDrawable {
     constructor() {
         super('Lvl: 1', canvasWidth - 20, 90,
             {font: 'bold 24px Arial', fillStyle: '#FEFC36', strokeStyle: '#000000', lineWidth: 3, textAlign: 'right'});
@@ -34,7 +34,7 @@ class LvlText extends RenderedShadowText {
     }
 }
 
-class HeartImage extends RenderedImage {
+class HeartImage extends ImageDrawable {
     constructor() {
         super('img/heart_mini.png', 20, canvasHeight - 68);
     }
@@ -43,7 +43,7 @@ class HeartImage extends RenderedImage {
     }
 }
 
-class LivesText extends RenderedShadowText {
+class LivesText extends ShadowTextDrawable {
     constructor() {
         super('x 3', 60, canvasHeight - 45,
             {font: '24px Arial', fillStyle: '#000000', strokeStyle: '#FFFFFF', lineWidth: 4, textAlign: 'left'});
@@ -72,7 +72,7 @@ class LivesText extends RenderedShadowText {
     }
 }
 
-class PauseBottomMessage extends RenderedText {
+class PauseBottomMessage extends TextDrawable {
     constructor() {
         super('Press \'p\' to pause or resume', canvasWidth - 10, canvasHeight - 45,
             {font: '18px Arial', fillStyle: '#FFFFFF', textAlign: 'right'});

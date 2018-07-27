@@ -14,7 +14,7 @@ res.addOnImagesLoadedCallback(() => {
     this.canvasHeight = 606;
 
     this.cols = 5;
-    this.rows = 6; // ?
+    this.rows = 6;
 
     this.transparentPartOfTileImage = 50;
     this.undergroundPartOfTileImage = 50;

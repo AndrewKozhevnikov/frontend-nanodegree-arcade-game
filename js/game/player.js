@@ -1,4 +1,4 @@
-class Player extends RenderedImage {
+class Player extends ImageDrawable {
     constructor() {
         super('img/char_boy.png');
 
@@ -16,6 +16,7 @@ class Player extends RenderedImage {
     reset() {
         this.setPositionOnBoard(5, 2);
         this.image = this.imageNormal;
+        this.setAnimation(null);
     }
 
     /**
