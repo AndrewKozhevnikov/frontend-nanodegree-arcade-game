@@ -28,7 +28,6 @@ class Level {
         this.renderTiles();
         this.renderLevelObjects();
         this.allEnemies.forEach(enemy => enemy.render());
-        // this.renderForeground();
     }
 
     update(dt) {
@@ -171,8 +170,8 @@ class Level {
         }
     }
 
-    // renderForeground() {
-    // }
+    renderForeground() {
+    }
 }
 
 class Level_1 extends Level {
@@ -208,26 +207,26 @@ class Level_2 extends Level {
         let fence_1 = new LevelObject('img/fence.png', false, false);
         let fence_2 = new LevelObject('img/fence.png', false, false);
         let fence_3 = new LevelObject('img/fence.png', false, false);
-        // let gem = new LevelObject('img/gem_orange.png', true, true, new Bonus({bonusScore: 500}));
 
-        let gemImage = res.get('img/gem_orange.png');
-        let size = Math.max(gemImage.width, gemImage.height);
-        let gemDrawables = [
-            new RadialGradientDrawable(0, 0, size),
-            new ImageDrawable('img/gem_orange.png')
-        ];
-        let gem = new LayerLevelObject(gemDrawables, true, true, new Bonus({bonusScore: 500}));
-        gem.setLayerAnimation(0, new ScaleUpDownAnimation(40, size, size + 20));
+        // let gemImage = res.get('img/gem_orange.png');
+        // let size = Math.max(gemImage.width, gemImage.height);
+        // let gradientDrawable = new RadialGradientDrawable(0, 0, size);
+        // let gemDrawables = [
+        //     gradientDrawable,
+        //     new ImageDrawable('img/gem_orange.png')
+        // ];
+        // let gem = new LayerLevelObject(gemDrawables, 1, true, true, new Bonus({bonusScore: 500}));
+        // gem.addLayerAnimation(0, new UpDownAnimator(gradientDrawable, 'scale', 0.6, 0.7, 1.1));
 
         let heart = new LevelObject('img/heart.png', true, true, new Bonus({bonusLives: 1, bonusScore: 100}));
-        heart.setAnimation(new ScaleUpDownAnimation());
+        heart.addAnimation(new UpDownAnimator(heart, 'scale', 0.15, 0.9, 1));
 
         // we could use the same object in different positions to increase performance
         // but if we use different instances we can apply different effects to these instances
         // for example one heart can fade in/out and another one can scale up/down at the same time
         this.levelObjects = [
             [fence_1, fence_2, fence_3, null, null],
-            [null, gem, null, null, null],
+            [null, null, null, null, null],
             [null, null, null, null, null],
             [null, null, null, heart, null],
             [null, null, null, null, null],
@@ -265,19 +264,16 @@ class Level_3 extends Level {
         let rock_3 = new LevelObject('img/rock.png', false, false);
         let rock_4 = new LevelObject('img/rock.png', false, false);
         let rock_5 = new LevelObject('img/rock.png', false, false);
-        // let gem = new LevelObject('img/gem_orange.png', true, true, new Bonus({bonusScore: 100}));
 
         let gemImage = res.get('img/gem_orange.png');
         let size = Math.max(gemImage.width, gemImage.height);
+        let gradientDrawable = new RadialGradientDrawable(0, 0, size);
         let gemDrawables = [
-            new RadialGradientDrawable(0, 0, size),
+            gradientDrawable,
             new ImageDrawable('img/gem_orange.png')
         ];
-        let gem = new LayerLevelObject(gemDrawables, true, true, new Bonus({bonusScore: 500}));
-        gem.setLayerAnimation(0, new ScaleUpDownAnimation(40, size, size + 20));
-
-        let heart = new LevelObject('img/heart.png', true, true, new Bonus({bonusLives: 1, bonusScore: 100}));
-        heart.setAnimation(new ScaleUpDownAnimation());
+        let gem = new LayerLevelObject(gemDrawables, 1, true, true, new Bonus({bonusScore: 500}));
+        gem.addLayerAnimation(0, new UpDownAnimator(gradientDrawable, 'scale', 0.6, 0.7, 1.1));
 
         this.levelObjects = [
             [null, null, null, null, fence],
@@ -314,7 +310,7 @@ class Level_4 extends Level {
     render() {
         this.renderTiles();
         this.renderLevelObjects();
-        this.renderForeground();
+        this.renderWater();
         this.allEnemies.forEach(enemy => enemy.render());
     }
 
@@ -344,7 +340,7 @@ class Level_4 extends Level {
         let emptyBarrier = new EmptyBarrier();
 
         let bottle = new LevelObject('img/bottle.png', true, true, new ScrollBonus({bonusScore: 100}));
-        bottle.setAnimation(new MoveUpDownAnimation(10, -6, 0));
+        bottle.addAnimation(new MoveUpDownAnimation(10, -6, 0));
 
         this.levelObjects = [
             [buoyLeftAway_1, buoyRightAway_1, buoyLeftAway_2, null, buoyRightAway_2],
@@ -366,7 +362,8 @@ class Level_4 extends Level {
         return winCondition;
     }
 
-    renderForeground() {
+    // todo check
+    renderWater() {
         let bottleRow = 4;
         let bottleX = 0;
         let bottleY = bottleRow * rowHeight + nextRowVisibleTop - this.submergedImage.height;

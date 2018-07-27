@@ -6,9 +6,9 @@ class Game {
 
         this.allLevels = [
             // new Level_1(this.player),
-            // new Level_2(this.player),
+            new Level_2(this.player)
             // new Level_3(this.player),
-            new Level_4(this.player)
+            // new Level_4(this.player),
             // new Level_5(this.player)
         ];
         this.currentLevel = this.allLevels[0];
@@ -48,10 +48,11 @@ class Game {
         let lvl = this.gameStateObjects.get('lvl').lvl;
         this.currentLevel = this.allLevels[lvl - 1];
 
+        let animation = this.player.getSwimAnimation();
         if (this.currentLevel.isWaterLevel()) {
-            this.player.setAnimation(new MoveUpDownAnimation(12, 0, 8));
+            this.player.addAnimation(animation);
         } else {
-            this.player.setAnimation(null);
+            this.player.removeAnimation(animation);
         }
 
         this.player.setPositionOnBoard(5, 2);
@@ -82,13 +83,10 @@ class Game {
      */
     render() {
         this.currentLevel.render();
-
-        this.gameStateObjects.forEach(obj => obj.render());
         this.additionalRenderObjects.forEach(obj => obj.render());
-
         this.player.render();
-
         this.currentLevel.renderForeground();
+        this.gameStateObjects.forEach(obj => obj.render());
 
         if (this.gameWon) {
             this.showWinDialog();
@@ -153,13 +151,11 @@ class Game {
     }
 
     showBonusText(text, x, y) {
-        const bonusTextObj = new TextDrawable(text, x, y, {font: 'bold 18px Arial', fillStyle: '#321156', textAlign: 'center'});
-        bonusTextObj.setAnimation(new MoveUpAnimation());
-        this.additionalRenderObjects.set('bonusText', bonusTextObj);
-
-        setTimeout(() => {
-            this.additionalRenderObjects.delete('bonusText');
-        }, 400);
+        const bonusText = new TextDrawable(text, x, y, {font: 'bold 18px Arial', fillStyle: '#321156', textAlign: 'center'});
+        let animation = new ValueAnimator(bonusText, 'y', -150, bonusText.y, bonusText.y - rowHeight);
+        animation.setOnAnimationEndCallback(() => this.additionalRenderObjects.delete('bonusText'));
+        bonusText.addAnimation(animation);
+        this.additionalRenderObjects.set('bonusText', bonusText);
     }
 
     showScroll(x, y) {
@@ -169,7 +165,7 @@ class Game {
         setTimeout(() => {
 
             let fadeOutTime = 1000;
-            scroll.setAnimation(new FadeOutAnimation(fadeOutTime));
+            scroll.addAnimation(new FadeOutAnimation(fadeOutTime));
             setTimeout(() => {
                 this.additionalRenderObjects.delete('scroll');
             }, fadeOutTime);

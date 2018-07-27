@@ -7,7 +7,13 @@ class Player extends ImageDrawable {
         this.imageNormal = res.get('img/char_boy.png');
         this.imageSad = res.get('img/char_boy_sad.png');
 
+        this.swimAnimation = new UpDownAnimator(this, 'y', 12, 0, 8);
+
         this.reset();
+    }
+
+    getSwimAnimation() {
+        return this.swimAnimation;
     }
 
     /**
@@ -16,7 +22,7 @@ class Player extends ImageDrawable {
     reset() {
         this.setPositionOnBoard(5, 2);
         this.image = this.imageNormal;
-        this.setAnimation(null);
+        this.removeAnimation(this.swimAnimation);
     }
 
     /**

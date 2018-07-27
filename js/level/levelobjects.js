@@ -25,8 +25,8 @@ class LevelObject extends ImageDrawable {
 }
 
 class LayerLevelObject extends LayerDrawable {
-    constructor(drawables, passable, collectible, bonus) {
-        super(drawables);
+    constructor(drawables, mainImageIndex, passable, collectible, bonus) {
+        super(drawables, mainImageIndex);
         this.passable = passable;
         this.collectible = collectible;
         this.bonus = bonus;

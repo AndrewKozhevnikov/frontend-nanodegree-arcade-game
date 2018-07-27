@@ -1,61 +1,131 @@
-class Animation {
-    constructor(speed = 150) {
-        this.setSpeed(speed);
-    }
-
-    setSpeed(speed) {
+class ValueAnimator {
+    constructor(objectToAnimate, propertyName, speed, valueFrom, valueTo) { // what is speed? sec? milli?
+        this.object = objectToAnimate;
+        this.propertyName = propertyName;
         this.speed = speed;
+        this.setValues(valueFrom, valueTo);
+        this.stopped = false;
     }
-}
 
-class MoveAnimation extends Animation {
+    setOnAnimationEndCallback(callback) {
+        this.animationEndCallback = callback;
+    }
+
+    setValues(valueFrom, valueTo) {
+        this.valueFrom = valueFrom;
+        this.valueTo = valueTo;
+        this.value = valueFrom;
+    }
+
+    reset() {
+        this.value = this.valueFrom;
+        this.stopped = false;
+    }
+
     update(dt) {
-        return this.speed * dt;
+        if (this.stopped) {
+            return;
+        }
+
+        this.value = this.value + this.speed * dt;
+        if ((this.speed > 0 && this.value >= this.valueTo) ||
+            (this.speed < 0 && this.value <= this.valueTo)){
+            this.value = this.valueTo;
+            this.stop();
+        }
+        this.object[this.propertyName] = this.value;
+    }
+
+    stop() {
+        this.stopped = true;
+        if (this.animationEndCallback != null) {
+            this.animationEndCallback();
+        }
     }
 }
 
-class MoveBackAnimation extends MoveAnimation {
-    update(dt) {
-        return -super.update(dt);
-    }
-}
-
-class JumpAnimation {
-    constructor(owner, duration = 900, speed = 80, min = -10, max = 0) {
-        // todo rename owner
-        this.owner = owner;
+class DurationAnimator extends ValueAnimator {
+    constructor(objectToAnimate, propertyName, speed, valueFrom, valueTo, duration) {
+        super(objectToAnimate, propertyName, speed, valueFrom, valueTo);
         this.duration = duration;
         this.startTime = Date.now();
+    }
 
-        this.speed = speed;
-        this.offset = 0;
-        this.min = min;
-        this.max = max;
-        this.direction = -1;
+    reset() {
+        super.reset();
+        this.startTime = Date.now();
     }
 
     update(dt) {
-        let now = Date.now();
-        if (now >= this.startTime + this.duration) {
-            this.owner.stopJumping();
+        if (Date.now() >= this.startTime + this.duration) {
+            this.object[this.propertyName] = this.valueTo;
+            this.stop();
+        } else {
+            super.update(dt);
         }
-
-        if (this.direction === 1 && this.offset >= this.max) {
-            return 0;
-        }
-
-        this.offset = this.offset + this.speed * dt * this.direction;
-        if (this.offset <= this.min) {
-            this.direction = 1;
-        }
-
-        return this.speed * dt * this.direction;
     }
 }
 
-class ForwardAndBackAnimation extends Animation {
+class UpDownAnimator extends ValueAnimator {
+    constructor(objectToAnimate, propertyName, speed, valueFrom, valueTo, repeatCount = -1){
+        super(objectToAnimate, propertyName, speed, valueFrom, valueTo);
+        this.direction = 1;
+        this.repeatCount = repeatCount;
+        this.counter = 0;
+    }
+
+    reset() {
+        super.reset();
+        this.counter = 0;
+    }
+
+    update(dt) {
+        if (this.stopped) {
+            return;
+        }
+
+        this.value = this.value + this.speed * dt * this.direction;
+
+        if (this.direction < 0 && this.value <= this.valueFrom) {
+            this.value = this.valueFrom;
+        } else if (this.direction > 0 && this.value >= this.valueTo) {
+            this.value = this.valueTo;
+        }
+
+        this.object[this.propertyName] = this.value;
+
+
+        if (this.value >= this.valueTo) {
+            this.direction = -1;
+            this.increaseCounter();
+        } else if (this.value <= this.valueFrom) {
+            this.direction = 1;
+            this.increaseCounter();
+        }
+
+        if ((this.repeatCount !== -1) && (this.counter / 2) >= this.repeatCount) {
+            this.stop();
+        }
+    }
+
+    increaseCounter() {
+        if (this.repeatCount !== -1) {
+            this.counter++;
+            console.log(this.counter);
+        }
+    }
+
+    stop() {
+        this.counter = 0;
+        super.stop();
+    }
+}
+
+// ----------------------------------------------------
+
+class ForwardAndBackAnimation {
     constructor(speed = 15, min = -8, max = 8, objectWidth = 0) {
-        super(speed);
+        this.speed = speed;
         this.offset = min;
         this.min = min;
         this.max = max;
@@ -76,24 +146,6 @@ class ForwardAndBackAnimation extends Animation {
     }
 }
 
-class MoveUpAnimation extends MoveBackAnimation {
-}
-
-class MoveDownAnimation extends MoveAnimation {
-}
-
-class MoveLeftAnimation extends MoveBackAnimation {
-}
-
-class MoveRightAnimation extends MoveAnimation {
-}
-
-class MoveUpDownAnimation extends ForwardAndBackAnimation {
-}
-
-class MoveLeftRightAnimation extends ForwardAndBackAnimation {
-}
-
 class FadeOutAnimation {
     constructor(time) {
         this.time = time;
@@ -102,28 +154,5 @@ class FadeOutAnimation {
 
     update(dt) {
         return -(dt * this.fromAlpha / this.time);
-    }
-}
-
-class ScaleUpDownAnimation extends Animation {
-    constructor(speed = 2, min = 8, max = 10) {
-        super(speed);
-        this.offset = min;
-        this.min = min;
-        this.max = max;
-        this.direction = 1;
-    }
-
-    update(dt) {
-        if (this.offset <= this.min) {
-            this.direction = 1;
-        } else if (this.offset >= this.max) {
-            this.direction = -1;
-        }
-
-        this.offset = this.offset + this.speed * dt * this.direction;
-
-        // percent
-        return (this.max / 100) * this.offset;
     }
 }

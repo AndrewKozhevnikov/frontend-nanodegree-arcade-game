@@ -1,11 +1,13 @@
+/**
+ * Abstract class. Should not be instantiated
+ */
 class Drawable {
     constructor(x, y) {
         this.setCoordinates(x, y);
         this.alpha = 1;
-        this.alphaOffset = 0;
-        this.xOffset = 0;
-        this.yOffset = 0;
-        this.scale = 0;
+        this.scale = 1;
+        this.rotateRad = 0;
+        this.animations = [];
     }
 
     setCoordinates(x, y) {
@@ -13,22 +15,16 @@ class Drawable {
         this.y = y;
     }
 
-    setAnimation(animation) {
-        this.animation = animation;
+    addAnimation(animation) {
+        this.animations.push(animation);
     }
 
-    applyAnimation(anim, dt) {
-        if (anim instanceof MoveLeftAnimation || anim instanceof MoveRightAnimation ||
-            anim instanceof MoveLeftRightAnimation) {
-            this.xOffset = anim.update(dt);
-        } else if (anim instanceof MoveUpAnimation || anim instanceof MoveDownAnimation ||
-            anim instanceof MoveUpDownAnimation || anim instanceof JumpAnimation) {
-            this.yOffset = anim.update(dt);
-        } else if (anim instanceof FadeOutAnimation) {
-            this.alphaOffset = anim.update(dt);
-        } else if (anim instanceof ScaleUpDownAnimation) {
-            this.scale = anim.update(dt);
-        }
+    removeAnimation(animation) {
+        this.animations.remove(animation);
+    }
+
+    hasAnimation(animation) {
+        return this.animations.indexOf(animation) !== -1;
     }
 
     /**
@@ -38,22 +34,11 @@ class Drawable {
      * @param dt a time delta between game ticks
      */
     update(dt) {
-        if (this.animation != null) {
-            this.applyAnimation(this.animation, dt);
-        }
-
-        this.scale = this.scale;
-        this.x = this.x + this.xOffset;
-        this.y = this.y + this.yOffset;
-
-        if (this.alpha <= 0.15) { // just turn it off at some point
-            this.alpha = 0;
-        } else {
-            this.alpha = this.alpha + this.alphaOffset;
-        }
+        this.animations.forEach(animation => animation.update(dt));
     }
 
     render() {
+        throw new Error('Drawable is an abstract class. It should not be instantiated');
     }
 }
 
@@ -104,7 +89,7 @@ class ImageDrawable extends Drawable {
         this.image = res.get(imageUrl);
         this.collisionRectScale = 0.6;
         this.rect = new CollisionRectangle(x, y, this.image.width, this.image.height, this.collisionRectScale);
-        this.drawCollisionRect = false;
+        this.drawCollisionRect = true;
     }
 
     update(dt) {
@@ -116,41 +101,24 @@ class ImageDrawable extends Drawable {
      * Draw on the screen using canvas
      */
     render() {
-        if (this.alphaOffset !== 0) {
-            this.renderWithAlpha();
-        } else if (this.scale !== 0) {
-            this.renderWithScale();
-        } else {
-            this.renderImage();
-        }
-    }
-
-    renderWithAlpha() {
-        ctx.save();
         ctx.globalAlpha = this.alpha;
-        this.renderImage();
-        ctx.restore();
-    }
 
-    renderWithScale() {
-        let offsetX = (this.image.width - this.image.width * this.scale) / 2;
-        let scaleX = (this.x + offsetX) / this.scale;
+        if (this.scale === 1) {
+            ctx.drawImage(this.image, this.x, this.y);
+        } else {
+            let offsetX = (this.image.width - this.image.width * this.scale) / 2;
+            let scaleX = (this.x + offsetX) / this.scale;
 
-        let offsetY = (this.image.height - this.image.height * this.scale) / 2;
-        let scaleY = (this.y + offsetY) / this.scale;
+            let offsetY = (this.image.height - this.image.height * this.scale) / 2;
+            let scaleY = (this.y + offsetY) / this.scale;
 
-        ctx.save();
-        ctx.scale(this.scale, this.scale);
-        ctx.drawImage(this.image, scaleX, scaleY);
-        ctx.restore();
-
-        if (this.drawCollisionRect) {
-            this.rect.drawCollisionBorder();
+            ctx.save();
+            ctx.scale(this.scale, this.scale); // todo try just size
+            ctx.drawImage(this.image, scaleX, scaleY);
+            ctx.restore();
         }
-    }
 
-    renderImage() {
-        ctx.drawImage(this.image, this.x, this.y);
+        ctx.globalAlpha = 1;
 
         if (this.drawCollisionRect) {
             this.rect.drawCollisionBorder();
@@ -159,16 +127,17 @@ class ImageDrawable extends Drawable {
 }
 
 class LayerDrawable {
-    constructor(drawables) {
+    constructor(drawables, mainImageIndex) {
         this.drawables = drawables;
+        this.mainImageIndex = mainImageIndex;
     }
 
     get image() {
-        return this.drawables[this.drawables.length - 1].image;
+        return this.drawables[this.mainImageIndex].image;
     }
 
     get rect() {
-        return this.drawables[this.drawables.length - 1].rect;
+        return this.drawables[this.mainImageIndex].rect;
     }
 
     update(dt) {
@@ -183,12 +152,20 @@ class LayerDrawable {
         this.drawables.forEach(drawable => drawable.setCoordinates(x, y));
     }
 
-    setLayerAnimation(index, animation) {
-        this.drawables[index].setAnimation(animation);
+    addLayerAnimation(index, animation) {
+        this.drawables[index].addAnimation(animation);
     }
 
-    setAnimation(animation) {
-        this.drawables.forEach(drawable => drawable.setAnimation(animation));
+    removeLayerAnimation(index, animation) {
+        this.drawables[index].removeAnimation(animation);
+    }
+
+    addAnimation(animation) {
+        this.drawables.forEach(drawable => drawable.addAnimation(animation));
+    }
+
+    removeAnimation(animation) {
+        this.drawables.forEach(drawable => drawable.removeAnimation(animation));
     }
 }
 
@@ -196,28 +173,18 @@ class RadialGradientDrawable extends Drawable {
     constructor(x, y, diameter) {
         super(x, y);
         this.diameter = diameter;
-        this.gradientRadius = this.diameter; // todo start radius setAnimation
-    }
-
-    update(dt) {
-        if (this.animation != null) {
-            this.gradientRadius = this.animation.update(dt);
-        }
+        this.gradientRadius = diameter;
     }
 
     render() {
-        let r = this.diameter / 2;
-        let x = this.x + r;
-        let y = this.y + r;
-        this.gradient = ctx.createRadialGradient(x, y, 0, x, y, this.gradientRadius);
-        this.gradient.addColorStop(0, 'rgba(255, 165, 0, 1)'); // 0
+        let centerX = this.x + this.diameter / 2;
+        let centerY = this.y + this.diameter / 2;
+        let r = this.gradientRadius * this.scale;
+        this.gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
+        this.gradient.addColorStop(0, 'rgba(255, 165, 0, 1)');
         this.gradient.addColorStop(1, 'rgba(255, 165, 0, 0)');
 
         ctx.fillStyle = this.gradient;
-        ctx.fillRect(this.x - 50, this.y - 50, 400, 400); // todo 50? find out how to set rect upper left corner
+        ctx.fillRect(centerX - r, centerY - r, centerX + r, centerY + r);
     }
-}
-
-class ColorDrawable extends Drawable {
-
 }
