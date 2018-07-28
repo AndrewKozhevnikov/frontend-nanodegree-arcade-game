@@ -1,179 +1,4 @@
-class Level {
-    constructor(player, enemyClassName) {
-        this.player = player;
-        this.allEnemies = [];
-        this.rowImages = [];
-        this.levelObjects = null; // 2 dimensional array
-
-        this.initEnemies(enemyClassName);
-    }
-
-    initEnemies(className) {
-        const EnemyClass = EnemyFactory.getClassByName(className);
-
-        for (let row = 1; row <= 3; row++) {
-            const enemy = new EnemyClass();
-            const y = row * rowHeight + nextRowVisibleTop - enemy.image.height - (rowHeight - enemy.image.height) / 2;
-            enemy.setCoordinates(0, y);
-            this.allEnemies.push(enemy);
-        }
-    }
-
-    isWaterLevel() {
-        return false;
-    }
-
-    render() {
-        this.renderTiles();
-        this.renderLevelObjects();
-        this.allEnemies.forEach(enemy => enemy.render());
-    }
-
-    update(dt) {
-        this.allEnemies.forEach(enemy => enemy.update(dt));
-
-        if (this.levelObjects == null) {
-            return;
-        }
-
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                let obj = this.levelObjects[row][col];
-                if (obj != null) {
-                    obj.update(dt);
-                }
-            }
-        }
-
-        this.allEnemies.forEach(enemy => {
-            if (this.collideWithLevelObject(enemy) && enemy instanceof BugEnemy && !enemy.isJumping()) {
-                enemy.jump();
-            }
-        });
-    }
-
-    // todo name looks awful. refactor // intersect, cross, crosses
-    collideWithLevelObject(enemy) {
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                let obj = this.levelObjects[row][col];
-                if (obj != null && enemy.rect.collidesWith(obj.rect)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    reset() {
-        this.resetLevelObjects();
-        this.allEnemies.forEach(enemy => enemy.resetPosition());
-    }
-
-    /**
-     * method to override
-     */
-    resetLevelObjects() {
-        this.levelObjects = null;
-    }
-
-    setLevelObjectsCoordinates() {
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                let obj = this.levelObjects[row][col];
-                if (obj != null && obj.image != null) {
-                    // place image at the tile center
-                    const x = col * colWidth + (colWidth - obj.image.width) / 2;
-                    const y = row * rowHeight + nextRowVisibleTop - obj.image.height - (rowHeight - obj.image.height) / 2;
-                    obj.setCoordinates(x, y);
-                }
-            }
-        }
-    }
-
-    /**
-     * Check if player's rect collides with some enemy's rect
-     *
-     * @returns {boolean}
-     */
-    collideWithEnemy(playerRect) {
-        for (let i = 0; i < this.allEnemies.length; i++) {
-            if (playerRect.collidesWith(this.allEnemies[i].rect)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    canPass(row, col) {
-        if (this.levelObjects == null) {
-            return true;
-        }
-
-        let obj = this.levelObjects[row][col];
-        if (obj != null && !obj.passable) {
-            return false;
-        }
-
-        return true;
-    }
-
-    canCollectItem(row, col) {
-        if (this.levelObjects == null) {
-            return false;
-        }
-
-        let obj = this.levelObjects[row][col];
-        return (obj != null && obj.collectible);
-    }
-
-    collectItem(row, col) {
-        let obj = this.levelObjects[row][col];
-        let bonus = obj.bonus;
-        this.levelObjects[row][col] = null;
-
-        return bonus;
-    }
-
-    canWinLevel() {
-        return true;
-    }
-
-    /**
-     * Draw all currentLevel tiles
-     */
-    renderTiles() {
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                if (this.rowImages[row]) {
-                    ctx.drawImage(res.get(this.rowImages[row]), col * colWidth, row * rowHeight);
-                }
-            }
-        }
-    }
-
-    renderLevelObjects() {
-        if (this.levelObjects == null) {
-            return;
-        }
-
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                let obj = this.levelObjects[row][col];
-                if (obj != null) {
-                    obj.render();
-                }
-            }
-        }
-    }
-
-    renderForeground() {
-    }
-}
-
-class Level_1 extends Level {
+class Level_1 extends BaseLevel {
     constructor(player) {
         super(player, 'BugEnemy');
         this.rowImages = [
@@ -187,7 +12,7 @@ class Level_1 extends Level {
     }
 }
 
-class Level_2 extends Level {
+class Level_2 extends BaseLevel {
     constructor(player) {
         super(player, 'BugEnemy');
         this.rowImages = [
@@ -220,9 +45,6 @@ class Level_2 extends Level {
         let heart = new LevelObject('img/heart.png', true, true, new Bonus({bonusLives: 1, bonusScore: 100}));
         heart.addAnimation(new UpDownAnimator(heart, 'scale', 0.15, 0.9, 1));
 
-        // we could use the same object in different positions to increase performance
-        // but if we use different instances we can apply different effects to these instances
-        // for example one heart can fade in/out and another one can scale up/down at the same time
         this.levelObjects = [
             [fence_1, fence_2, fence_3, null, null],
             [null, gem, null, null, null],
@@ -241,7 +63,7 @@ class Level_2 extends Level {
     }
 }
 
-class Level_3 extends Level {
+class Level_3 extends BaseLevel {
     constructor(player) {
         super(player, 'BugEnemy');
         this.rowImages = [
@@ -289,7 +111,7 @@ class Level_3 extends Level {
     }
 }
 
-class Level_4 extends Level {
+class Level_4 extends BaseLevel {
     constructor(player) {
         super(player, 'SharkFinEnemy');
         this.rowImages = [
@@ -308,20 +130,22 @@ class Level_4 extends Level {
 
     render() {
         this.renderTiles();
-        this.renderLevelObjects();
+        this.callLevelObjectsMethod('render');
+        this.player.render();
         this.renderWater();
         this.allEnemies.forEach(enemy => enemy.render());
+        this.renderFarSea();
     }
 
-    renderTiles() {
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                if (this.rowImages[row]) {
-                    ctx.drawImage(res.get(this.rowImages[row]), col * colWidth, row * rowHeight);
-                }
-            }
-        }
-    }
+    // renderTiles() {
+    //     for (let row = 0; row < rows; row++) {
+    //         for (let col = 0; col < cols; col++) {
+    //             if (this.rowImages[row]) {
+    //                 ctx.drawImage(res.get(this.rowImages[row]), col * colWidth, row * rowHeight);
+    //             }
+    //         }
+    //     }
+    // }
 
     isWaterLevel() {
         return true;
@@ -375,18 +199,20 @@ class Level_4 extends Level {
         ctx.drawImage(this.submergedImage, bottleX, bottleY);
         ctx.drawImage(this.submergedImage, playerX, playerY);
         ctx.restore();
+    }
 
+    renderFarSea() {
         // make far sea darker
-        let alpha = 0.15;
+        let alpha = 0.4;
         for (let row = 0; row < rows; row++) {
             ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
             ctx.fillRect(0, row * rowHeight + transparentPartOfTileImage, canvasWidth, rowHeight);
-            alpha -= 0.03;
+            alpha -= 0.08;
         }
     }
 }
 
-class Level_5 extends Level {
+class Level_5 extends BaseLevel {
     constructor(player) {
         super(player, 'SharkEnemy');
         this.reset();
@@ -420,8 +246,5 @@ class Level_5 extends Level {
         ctx.drawImage(octo, canvasWidth - octo.width, bg.height - octo.height + transparentPartOfTileImage);
 
         // todo drawSadChars (1 object)
-    }
-
-    renderForeground() {
     }
 }

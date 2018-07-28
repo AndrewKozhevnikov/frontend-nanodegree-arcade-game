@@ -5,7 +5,7 @@ class Player extends ImageDrawable {
         this.imageNormal = res.get('img/char_boy.png');
         this.imageSad = res.get('img/char_boy_sad.png');
 
-        this.swimAnimation = new UpDownAnimator(this, 'y', 12, this.y, this.y - 8);
+        this.swimAnimation = new UpDownAnimator(this, 'y', 12, this.y, this.y + 8);
 
         this.reset();
     }
@@ -35,7 +35,7 @@ class Player extends ImageDrawable {
 
 
         // todo looks terrible to init in constructor and then to set coordinates somewhere else
-        this.swimAnimation.setValues(this.y, this.y - 8);
+        this.swimAnimation.setValues(this.y, this.y + 8);
     }
 
     setImage(image) {
