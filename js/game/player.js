@@ -2,12 +2,10 @@ class Player extends ImageDrawable {
     constructor() {
         super('img/char_boy.png');
 
-        // todo refactor initialization and reset functions
-
         this.imageNormal = res.get('img/char_boy.png');
         this.imageSad = res.get('img/char_boy_sad.png');
 
-        this.swimAnimation = new UpDownAnimator(this, 'y', 12, 0, 8);
+        this.swimAnimation = new UpDownAnimator(this, 'y', 12, this.y, this.y - 8);
 
         this.reset();
     }
@@ -34,6 +32,10 @@ class Player extends ImageDrawable {
         const x = this.col * colWidth + (colWidth - this.image.width) / 2;
         const y = row * rowHeight + nextRowVisibleTop - this.image.height;
         this.setCoordinates(x, y);
+
+
+        // todo looks terrible to init in constructor and then to set coordinates somewhere else
+        this.swimAnimation.setValues(this.y, this.y - 8);
     }
 
     setImage(image) {

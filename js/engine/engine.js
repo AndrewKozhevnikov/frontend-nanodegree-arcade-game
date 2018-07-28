@@ -128,7 +128,7 @@ class Engine {
 
     /**
      * Draw rectangle with some text.
-     * This will look like dialog
+     * This will look like a dialog
      *
      * @param title
      * @param msg

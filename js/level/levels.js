@@ -13,7 +13,6 @@ class Level {
 
         for (let row = 1; row <= 3; row++) {
             const enemy = new EnemyClass();
-            // todo refactor remove nextRowVisibleTop
             const y = row * rowHeight + nextRowVisibleTop - enemy.image.height - (rowHeight - enemy.image.height) / 2;
             enemy.setCoordinates(0, y);
             this.allEnemies.push(enemy);
@@ -53,7 +52,7 @@ class Level {
         });
     }
 
-    // todo name looks awful. refactor
+    // todo name looks awful. refactor // intersect, cross, crosses
     collideWithLevelObject(enemy) {
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
@@ -208,15 +207,15 @@ class Level_2 extends Level {
         let fence_2 = new LevelObject('img/fence.png', false, false);
         let fence_3 = new LevelObject('img/fence.png', false, false);
 
-        // let gemImage = res.get('img/gem_orange.png');
-        // let size = Math.max(gemImage.width, gemImage.height);
-        // let gradientDrawable = new RadialGradientDrawable(0, 0, size);
-        // let gemDrawables = [
-        //     gradientDrawable,
-        //     new ImageDrawable('img/gem_orange.png')
-        // ];
-        // let gem = new LayerLevelObject(gemDrawables, 1, true, true, new Bonus({bonusScore: 500}));
-        // gem.addLayerAnimation(0, new UpDownAnimator(gradientDrawable, 'scale', 0.6, 0.7, 1.1));
+        let gemImage = res.get('img/gem_orange.png');
+        let size = Math.max(gemImage.width, gemImage.height);
+        let gradientDrawable = new RadialGradientDrawable(0, 0, size);
+        let gemDrawables = [
+            gradientDrawable,
+            new ImageDrawable('img/gem_orange.png')
+        ];
+        let gem = new LayerLevelObject(gemDrawables, 1, true, true, new Bonus({bonusScore: 500}));
+        gem.addLayerAnimation(0, new UpDownAnimator(gradientDrawable, 'scale', 0.6, 0.7, 1.1));
 
         let heart = new LevelObject('img/heart.png', true, true, new Bonus({bonusLives: 1, bonusScore: 100}));
         heart.addAnimation(new UpDownAnimator(heart, 'scale', 0.15, 0.9, 1));
@@ -226,7 +225,7 @@ class Level_2 extends Level {
         // for example one heart can fade in/out and another one can scale up/down at the same time
         this.levelObjects = [
             [fence_1, fence_2, fence_3, null, null],
-            [null, null, null, null, null],
+            [null, gem, null, null, null],
             [null, null, null, null, null],
             [null, null, null, heart, null],
             [null, null, null, null, null],
@@ -340,7 +339,7 @@ class Level_4 extends Level {
         let emptyBarrier = new EmptyBarrier();
 
         let bottle = new LevelObject('img/bottle.png', true, true, new ScrollBonus({bonusScore: 100}));
-        bottle.addAnimation(new MoveUpDownAnimation(10, -6, 0));
+        bottle.addAnimation(new UpDownAnimator(bottle, 'y', 10, -6, 0));
 
         this.levelObjects = [
             [buoyLeftAway_1, buoyRightAway_1, buoyLeftAway_2, null, buoyRightAway_2],
@@ -420,7 +419,7 @@ class Level_5 extends Level {
         this.allEnemies.forEach(enemy => enemy.render());
         ctx.drawImage(octo, canvasWidth - octo.width, bg.height - octo.height + transparentPartOfTileImage);
 
-        // todo start from here drawSadChars (1 object)
+        // todo drawSadChars (1 object)
     }
 
     renderForeground() {

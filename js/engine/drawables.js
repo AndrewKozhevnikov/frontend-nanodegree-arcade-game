@@ -106,16 +106,13 @@ class ImageDrawable extends Drawable {
         if (this.scale === 1) {
             ctx.drawImage(this.image, this.x, this.y);
         } else {
-            let offsetX = (this.image.width - this.image.width * this.scale) / 2;
-            let scaleX = (this.x + offsetX) / this.scale;
+            let scaledWidth = this.image.width * this.scale;
+            let scaledHeight = this.image.height * this.scale;
 
-            let offsetY = (this.image.height - this.image.height * this.scale) / 2;
-            let scaleY = (this.y + offsetY) / this.scale;
+            let scaledX = this.x + (this.image.width - scaledWidth) / 2;
+            let scaledY = this.y + (this.image.height - scaledHeight) / 2;
 
-            ctx.save();
-            ctx.scale(this.scale, this.scale); // todo try just size
-            ctx.drawImage(this.image, scaleX, scaleY);
-            ctx.restore();
+            ctx.drawImage(this.image, scaledX, scaledY, scaledWidth, scaledHeight);
         }
 
         ctx.globalAlpha = 1;
@@ -179,6 +176,7 @@ class RadialGradientDrawable extends Drawable {
     render() {
         let centerX = this.x + this.diameter / 2;
         let centerY = this.y + this.diameter / 2;
+
         let r = this.gradientRadius * this.scale;
         this.gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r);
         this.gradient.addColorStop(0, 'rgba(255, 165, 0, 1)');

@@ -6,9 +6,9 @@ class Game {
 
         this.allLevels = [
             // new Level_1(this.player),
-            new Level_2(this.player)
+            // new Level_2(this.player),
             // new Level_3(this.player),
-            // new Level_4(this.player),
+            new Level_4(this.player)
             // new Level_5(this.player)
         ];
         this.currentLevel = this.allLevels[0];
@@ -152,7 +152,7 @@ class Game {
 
     showBonusText(text, x, y) {
         const bonusText = new TextDrawable(text, x, y, {font: 'bold 18px Arial', fillStyle: '#321156', textAlign: 'center'});
-        let animation = new ValueAnimator(bonusText, 'y', -150, bonusText.y, bonusText.y - rowHeight);
+        let animation = new LinearAnimator(bonusText, 'y', 150, bonusText.y, bonusText.y - rowHeight);
         animation.setOnAnimationEndCallback(() => this.additionalRenderObjects.delete('bonusText'));
         bonusText.addAnimation(animation);
         this.additionalRenderObjects.set('bonusText', bonusText);
@@ -263,7 +263,9 @@ class Game {
     }
 }
 
-// todo next - level 5
+// todo refactor initialization and reset functions
+// check inheritance
+
 // choose player
 
 // player underwater fall
@@ -276,6 +278,7 @@ class Game {
 // all happy
 // flying hearts
 
-// unfinished: levels, animation, reset, game stats precise positions, jump animation bug, scale animation do not scale
+// game stats precise positions
 //
 // level 4 -> draw enemy on foreground, help message
+// SharkFinEnemy rotate animation ???

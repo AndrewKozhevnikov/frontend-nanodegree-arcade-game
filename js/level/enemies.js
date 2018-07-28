@@ -21,14 +21,14 @@ class EnemyFactory {
 class Enemy extends ImageDrawable {
     constructor(imageUrl, x, y) {
         super(imageUrl, x, y);
-        this.minSpeed = 20;
-        this.maxSpeed = 20;
-        // this.minSpeed = 50;
-        // this.maxSpeed = 100;
         // this.minSpeed = 100;
         // this.maxSpeed = 200;
-        // this.minSpeed = 150;
-        // this.maxSpeed = 300;
+        // this.jumpSpeed = 50;
+        this.minSpeed = 150;
+        this.maxSpeed = 300;
+        this.jumpSpeed = 70;
+        this.jumpHeight = 10;
+        this.jumpAnimationTimeout = 700;
     }
 
     /**
@@ -42,7 +42,9 @@ class Enemy extends ImageDrawable {
     resetAnimations() {
         this.animations.forEach(animation => {
             animation.reset();
-            animation.speed = random(this.minSpeed, this.maxSpeed); // todo speed only for movement
+            if (animation instanceof LinearAnimator && animation.propertyName === 'x') {
+                animation.speed = random(this.minSpeed, this.maxSpeed);
+            }
         });
     }
 
@@ -68,34 +70,40 @@ class BugEnemy extends Enemy {
         super('img/enemy_bug.png', x, y);
         let speed = random(this.minSpeed, this.maxSpeed);
         // todo animator or animation ?
-        this.addAnimation(new ValueAnimator(this, 'x', speed, 0, canvasWidth));
+        this.addAnimation(new LinearAnimator(this, 'x', speed, 0, canvasWidth));
 
         this.beforeJumpY = this.y;
-        this.jumpAnimation = new UpDownAnimator(this, 'y', 40, this.y, this.y + 20, 1); // todo -50
+        this.jumpToY = this.y - this.jumpHeight;
+        this.jumpAnimation = new UpDownAnimator(this, 'y', this.jumpSpeed, this.y, this.jumpToY, 1);
         this.jumpAnimation.setOnAnimationEndCallback(() => {
-            this.y = this.beforeJumpY;
-            this.removeAnimation(this.jumpAnimation);
+            setTimeout(() => {
+                this.removeJumpAnimation();
+            }, this.jumpAnimationTimeout);
         });
+    }
+
+    removeJumpAnimation() {
+        this.y = this.beforeJumpY;
+
+        if (this.isJumping()) {
+            this.jumpAnimation.reset(); // todo why reset?
+            this.removeAnimation(this.jumpAnimation);
+        }
     }
 
     setCoordinates(x, y) {
         super.setCoordinates(x, y);
         this.beforeJumpY = this.y;
+        this.jumpToY = this.y - this.jumpHeight;
     }
 
     resetPosition() {
-        this.y = this.beforeJumpY;
-
-        if (this.hasAnimation(this.jumpAnimation)) {
-            this.jumpAnimation.reset();
-            this.removeAnimation(this.jumpAnimation);
-        }
-
+        this.removeJumpAnimation();
         super.resetPosition();
     }
 
     jump() {
-        this.jumpAnimation.setValues(this.y, this.y + 50);
+        this.jumpAnimation.setValues(this.y, this.jumpToY);
         this.addAnimation(this.jumpAnimation);
     }
 
@@ -104,14 +112,12 @@ class BugEnemy extends Enemy {
     }
 }
 
-// ---------------------------------------------------------
-
 class SharkFinEnemy extends Enemy {
     constructor(x, y) {
         super('img/enemy_shark_fin.png', x, y);
 
         let speed = random(this.minSpeed, this.maxSpeed);
-        let animation = new MoveLeftRightAnimation(speed, 0, canvasWidth, this.image.width);
+        let animation = new UpDownAnimator(this, 'x', speed, 0, canvasWidth, -1, this.image.width);
         this.addAnimation(animation);
 
         this.imageNormal = res.get('img/enemy_shark_fin.png');
@@ -123,11 +129,15 @@ class SharkFinEnemy extends Enemy {
 
         if (this.x <= 0) {
             this.image = this.imageNormal;
-        } else if (this.x + this.image.width >= canvasWidth) { // rotate animation ???
+        } else if (this.x + this.image.width >= canvasWidth) {
             this.image = this.imageRevert;
         }
     }
 }
+
+// done
+// ---------------------------------------------------------
+// unfinished
 
 class SharkEnemy extends Enemy {
     constructor(x, y) {
