@@ -3,33 +3,107 @@ class BaseLevel {
         this.player = player;
         this.allEnemies = [];
         this.rowImages = [];
-        this.levelObjects = null; // 2 dimensional array
         this.additionalRenderObjects = new Map();
 
         this.initEnemies(enemyClassName);
+
+        this.levelScheme = [
+            [null, null, null, null, null],
+            [null, null, null, null, null],
+            [null, null, null, null, null],
+            [null, null, null, null, null],
+            [null, null, null, null, null],
+            [null, null, null, null, null]
+        ];
+
+        this.levelObjects = [
+            [null, null, null, null, null],
+            [null, null, null, null, null],
+            [null, null, null, null, null],
+            [null, null, null, null, null],
+            [null, null, null, null, null],
+            [null, null, null, null, null]
+        ];
+    }
+
+    createLevelObject(objectType, row, col) {
+        let obj;
+
+        let imageUrl = LevelObjectImageFactory.getImageUrl(objectType);
+        let image = res.get(imageUrl);
+
+        let left = col * colWidth + (colWidth - image.width) / 2;
+        let top = row * rowHeight + nextRowVisibleTop - image.height - (rowHeight - image.height) / 2;
+
+        switch (objectType) {
+            case 'empty':
+                obj = new EmptyBarrier();
+                break;
+            case 'fence':
+            case 'rock':
+            case 'buoyLeftAway':
+            case 'buoyRightAway':
+            case 'buoyLeft':
+            case 'buoyRight':
+                obj = new LevelObject(image, left, top, false, false);
+                break;
+            case 'heart':
+                obj = new LevelObject(image, left, top, true, true, new Bonus({bonusLives: 1, bonusScore: 100}));
+                obj.addAnimation(new ForwardBackAnimation(obj.drawable, 'scale', 0.15, 0.9, 1));
+                break;
+            case 'bottle':
+                obj = new LevelObject(image, left, top, true, true, new ScrollBonus({bonusScore: 100}));
+                obj.addAnimation(new ForwardBackAnimation(obj.rect, 'top', 10, obj.rect.top - 6, obj.rect.top));
+                break;
+            case 'gem':
+                let radius = Math.max(image.width, image.height);
+                let gradient = new RadialGradientDrawable('rgb(255, 165, 0)', 0, 0, radius);
+                gradient.addAnimation(new ForwardBackAnimation(gradient, 'scale', 0.5, 0.7, 1));
+                let gem = new ImageDrawable(image, radius - image.width / 2, radius - image.height / 2);
+
+                left = col * colWidth + (colWidth - radius * 2) / 2;
+                top = row * rowHeight + nextRowVisibleTop - radius * 2 - (rowHeight - radius * 2) / 2; // todo looks
+                // ugly
+
+                obj = new LayerLevelObject([gradient, gem], left, top, radius * 2, radius * 2,
+                    true, true, new Bonus({bonusScore: 500}));
+                break;
+            default:
+                throw new Error('Unknown LevelObject type');
+        }
+
+        return obj;
+    }
+
+    // todo
+    // buoyLeft.updateRectCoordinates(buoyLeft.rect.left, buoyLeft.rect.top - 50);
+    // buoyRight.updateRectCoordinates(buoyRight.rect.left, buoyRight.rect.top - 30);
+
+    resetLevelObjects() {
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                let objectType = this.levelScheme[row][col];
+                if (objectType != null) {
+                    this.levelObjects[row][col] = this.createLevelObject(objectType, row, col);
+                } else {
+                    this.levelObjects[row][col] = null;
+                }
+            }
+        }
     }
 
     initLevel() {
-        let animation = this.player.getSwimAnimation();
-        if (this.isWaterLevel()) {
-            this.player.addAnimation(animation);
-        } else {
-            this.player.removeAnimation(animation);
-        }
-
-        this.player.setPositionOnBoard(5, 2);
+        this.player.reset(5, 2, this.isWaterLevel());
     }
 
     initEnemies(className) {
-        const EnemyClass = EnemyFactory.getClassByName(className);
+        let EnemyClass = EnemyFactory.getClassByName(className);
+        let imageUrl = EnemyImageFactory.getImageUrl(className);
+        let image = res.get(imageUrl);
 
-        // todo  EnemyClass.getImageUrl() =>
-        // constructor params =>
-        // remove enemy.setCoordinates(0, y);
         for (let row = 1; row <= 3; row++) {
-            const enemy = new EnemyClass();
-            const y = row * rowHeight + nextRowVisibleTop - enemy.image.height - (rowHeight - enemy.image.height) / 2;
-            enemy.setCoordinates(0, y);
+            let top = row * rowHeight + nextRowVisibleTop - image.height - (rowHeight - image.height) / 2;
+            let enemy = new EnemyClass(image, 0, top);
             this.allEnemies.push(enemy);
         }
     }
@@ -39,7 +113,7 @@ class BaseLevel {
     }
 
     render() {
-        this.renderTiles();
+        this.renderTiles(); //todo  move to initialization
         this.callLevelObjectsMethod('render');
         this.allEnemies.forEach(enemy => enemy.render());
         this.player.render();
@@ -87,15 +161,15 @@ class BaseLevel {
     }
 
     looseLife() {
-        this.player.setImage(this.player.imageSad);
-        game.setGameState(game.GAME_STATE_LOOSING_LIFE);
+        this.player.setState(this.player.STATE_SAD);
+        game.setGameState(game.STATE_LOOSING_LIFE);
         game.setPause(true);
 
         setTimeout(() => {
-            this.player.setImage(this.player.imageNormal);
-            game.setGameState(game.GAME_STATE_NORMAL);
+            this.player.setState(this.player.STATE_NORMAL);
+            game.setGameState(game.STATE_NORMAL);
             if (!game.gameLost) {
-                this.player.setPositionOnBoard(5, 2);
+                this.player.changePositionOnBoard(5, 2);
             }
             game.setPause(false);
         }, 400);
@@ -119,27 +193,6 @@ class BaseLevel {
         this.allEnemies.forEach(enemy => enemy.resetPosition());
         this.player.reset();
         this.additionalRenderObjects = new Map();
-    }
-
-    /**
-     * method to override
-     */
-    resetLevelObjects() {
-        this.levelObjects = null;
-    }
-
-    setLevelObjectsCoordinates() {
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
-                let obj = this.levelObjects[row][col];
-                if (obj != null && obj.image != null) {
-                    // place image at the tile center
-                    const x = col * colWidth + (colWidth - obj.image.width) / 2;
-                    const y = row * rowHeight + nextRowVisibleTop - obj.image.height - (rowHeight - obj.image.height) / 2;
-                    obj.setCoordinates(x, y);
-                }
-            }
-        }
     }
 
     /**
@@ -197,6 +250,7 @@ class BaseLevel {
     /**
      * Draw all currentLevel tiles
      */
+    // todo render on bg ctx
     renderTiles() {
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
@@ -207,22 +261,24 @@ class BaseLevel {
         }
     }
 
-    showBonusText(text, x, y) {
-        const bonusText = new TextDrawable(text, x, y, {font: 'bold 18px Arial', fillStyle: '#321156', textAlign: 'center'});
-        let animation = new LinearAnimator(bonusText, 'y', 150, bonusText.y, bonusText.y - rowHeight);
+    showBonusText(text, left, top) {
+        let bonusText = new TextDrawable(text, left, top,
+            {color: '#321156', textAlign: 'center'},
+            {fontWeight: 'bold', fontSize: '18'});
+        let animation = new LinearAnimation(bonusText, 'top', 150, bonusText.top, bonusText.top - rowHeight);
         animation.setOnAnimationEndCallback(() => this.additionalRenderObjects.delete('bonusText'));
         bonusText.addAnimation(animation);
         this.additionalRenderObjects.set('bonusText', bonusText);
     }
 
-    showScroll(x, y) {
-        const scroll = new ImageDrawable('img/scroll.png', x, y);
+    showScroll(left, top) {
+        let scroll = new ImageDrawable(res.get('img/scroll.png'), left, top);
         this.additionalRenderObjects.set('scroll', scroll);
 
         setTimeout(() => {
 
             let fadeOutTime = 1000;
-            scroll.addAnimation(new FadeOutAnimation(fadeOutTime));
+            scroll.addAnimation(new LinearAnimation(scroll.rect, 'alpha', 1, 1, 0));
             setTimeout(() => {
                 this.additionalRenderObjects.delete('scroll');
             }, fadeOutTime);
@@ -231,7 +287,7 @@ class BaseLevel {
     }
 
     handleInput(keyCode) {
-        const allowedKeys = {
+        let allowedKeys = {
             37: 'left',
             38: 'up',
             39: 'right',
@@ -272,17 +328,17 @@ class BaseLevel {
                 break;
         }
 
-        this.player.setPositionOnBoard(this.player.row, this.player.col);
+        this.player.changePositionOnBoard(this.player.row, this.player.col);
         this.player.update(0);
 
         if (this.canCollectItem(this.player.row, this.player.col)) {
             let bonus = this.collectItem(this.player.row, this.player.col);
             game.addBonus(bonus);
 
-            this.showBonusText(bonus.getBonusText(), this.player.rect.centerX, this.player.rect.y);
+            this.showBonusText(bonus.getBonusText(), this.player.rect.centerX, this.player.rect.top);
 
             if (bonus instanceof ScrollBonus) {
-                this.showScroll(this.player.rect.right + 10, this.player.rect.y - this.player.rect.height);
+                this.showScroll(this.player.rect.right + 10, this.player.rect.top - this.player.rect.height);
             }
         }
     }

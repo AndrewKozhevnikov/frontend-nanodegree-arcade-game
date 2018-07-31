@@ -1,0 +1,2 @@
+class SharkEnemy extends BaseEnemy {
+}

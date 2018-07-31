@@ -1,0 +1,2 @@
+class ScrollBonus extends Bonus {
+}

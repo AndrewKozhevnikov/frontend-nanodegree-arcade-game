@@ -32,7 +32,7 @@ class Resources {
         if (this.cache[url]) {
             return this.cache[url];
         } else {
-            const img = new Image();
+            let img = new Image();
             img.src = url;
             img.onload = () => {
                 this.cache[url] = img;

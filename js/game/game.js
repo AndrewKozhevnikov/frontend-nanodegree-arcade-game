@@ -3,8 +3,8 @@ class Game {
         document.addEventListener('keyup', event => this.handleInput(event.keyCode));
 
         // define constants
-        this.GAME_STATE_NORMAL = 'GAME_STATE_NORMAL';
-        this.GAME_STATE_LOOSING_LIFE = 'GAME_STATE_LOOSING_LIFE';
+        this.STATE_NORMAL = 'STATE_NORMAL';
+        this.STATE_LOOSING_LIFE = 'STATE_LOOSING_LIFE';
 
         let player = new Player();
 
@@ -35,6 +35,7 @@ class Game {
     resetGame() {
         this.allLevels.forEach(level => level.reset());
         this.currentLevel = this.allLevels[0];
+        this.currentLevel.initLevel();
 
         this.gameStateObjects.forEach(obj => obj.reset());
 
@@ -112,16 +113,16 @@ class Game {
      * After timeout resetGame to default state
      */
     setGameState(state) {
-        const lives = this.gameStateObjects.get('lives');
+        let lives = this.gameStateObjects.get('lives');
 
         switch (state) {
-            case this.GAME_STATE_NORMAL:
+            case this.STATE_NORMAL:
                 lives.setStrokeColor(lives.colorWhite);
                 if (lives.lives <= 0) {
                     this.gameLost = true;
                 }
                 break;
-            case this.GAME_STATE_LOOSING_LIFE:
+            case this.STATE_LOOSING_LIFE:
                 lives.setStrokeColor(lives.colorYellow);
                 lives.looseLife();
                 break;
@@ -142,7 +143,7 @@ class Game {
      * @param keyCode
      */
     handleInput(keyCode) {
-        const allowedKeys = {
+        let allowedKeys = {
             80: 'pause',
             13: 'enter'
         };
@@ -169,7 +170,6 @@ class Game {
 }
 
 // todo refactor initialization and reset functions
-// check inheritance
 
 // choose player
 
@@ -183,9 +183,7 @@ class Game {
 // all happy
 // flying hearts
 
-// game stats precise positions
-//
-// level 4 -> draw enemy on foreground, help message
-// SharkFinEnemy rotate animation ???
-
 // jsdocs
+// uml
+
+// babel

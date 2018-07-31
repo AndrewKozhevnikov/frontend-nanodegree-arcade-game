@@ -50,11 +50,22 @@ res.load([
     'img/buoy_right_away.png',
 
     'img/char_boy.png',
+    'img/char_boy_happy.png',
     'img/char_boy_sad.png',
     'img/char_cat_girl.png',
+    'img/char_cat_girl_happy.png',
+    'img/char_cat_girl_sad.png',
     'img/char_horn_girl.png',
+    'img/char_horn_girl_happy.png',
+    'img/char_horn_girl_sad.png',
     'img/char_pink_girl.png',
+    'img/char_pink_girl_happy.png',
+    'img/char_pink_girl_sad.png',
     'img/char_princess_girl.png',
+    'img/char_princess_girl_happy.png',
+    'img/char_princess_girl_sad.png',
+
+    'img/empty_pixel.png',
 
     'img/enemy_bug.png',
     'img/enemy_shark.png',

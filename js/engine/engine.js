@@ -9,6 +9,13 @@ class Engine {
         this.canvas.width = canvasWidth;
         this.canvas.height = canvasHeight;
         document.body.appendChild(this.canvas);
+
+        this.fps = 0;
+        this.fpsString = 'fps: ' + parseInt(this.fps);
+        this.timer = new Timer();
+        this.timer.addEventListener('secondsUpdated', () => {
+            this.fpsString = 'fps: ' + parseInt(this.fps);
+        });
     }
 
     getCanvasContext() {
@@ -21,6 +28,7 @@ class Engine {
     start() {
         this.stopped = false;
         this.lastTime = Date.now();
+        this.timer.start();
         this.gameLoop();
     }
 
@@ -29,6 +37,7 @@ class Engine {
      */
     stop() {
         this.stopped = true;
+        this.timer.stop();
     }
 
     /**
@@ -39,8 +48,12 @@ class Engine {
             return;
         }
 
-        const now = Date.now();
-        const dt = (now - this.lastTime) / 1000.0;
+        let now = Date.now();
+        let dt = (now - this.lastTime) / 1000.0;
+        this.fps = 1 / dt;
+        // if (this.fps < 55) {
+        //     throw new Error('Performance issue');
+        // }
 
         this.update(dt);
         this.render();
@@ -71,50 +84,46 @@ class Engine {
     render() {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         game.render();
+
+        this.fillText(this.fpsString, canvasWidth - 10, 40, {color: '#FFFFFF', textAlign: 'right'});
     }
 
     /**
      * Utility method with some default parameters.
-     * Parameters text, x, y are required
+     * Parameters text, left, top are required
      */
-    strokeText(text, x, y, {font = '24px Arial', strokeStyle = '#FFFFFF', lineWidth = 3, textAlign = 'x'} = {}) {
-        ctx.font = font;
-        ctx.strokeStyle = strokeStyle;
+    strokeText(text, left, top,
+               {color = '#FFFFFF', textAlign = 'left', lineWidth = 3} = {},
+               {fontWeight = '', fontSize = '24', fontFamily = 'Arial'} = {}) {
+
+        if (fontWeight.length > 0) fontWeight += ' ';
+        ctx.font = fontWeight + fontSize + 'px ' + fontFamily;
+        ctx.strokeStyle = color;
+        ctx.textAlign = textAlign;
         ctx.lineWidth = lineWidth;
-        ctx.textAlign = textAlign;
-        ctx.strokeText(text, x, y);
+        ctx.strokeText(text, left, top);
     }
 
     /**
      * Utility method with some default parameters.
-     * Parameters text, x, y are required
+     * Parameters text, left, top are required
      */
-    fillText(text, x, y, {font = '24px Arial', fillStyle = '#000000', textAlign = 'x'} = {}) {
-        ctx.font = font;
-        ctx.fillStyle = fillStyle;
-        ctx.textAlign = textAlign;
-        ctx.fillText(text, x, y);
-    }
+    fillText(text, left, top,
+             {color = '#000000', textAlign = 'left'} = {},
+             {fontWeight = '', fontSize = '24', fontFamily = 'Arial'} = {}) {
 
-    /**
-     * Stroke text.
-     * Then fill the same text.
-     * This will affect text to look like it has border
-     */
-    strokeAndFillText(text, x, y,
-                      {
-                          font = '24px Arial', fillStyle = '#000000', strokeStyle = '#FFFFFF',
-                          lineWidth = 3, textAlign = 'left'
-                      } = {}) {
-        this.strokeText(text, x, y, {font, strokeStyle, lineWidth, textAlign});
-        this.fillText(text, x, y, {font, fillStyle, textAlign});
+        if (fontWeight.length > 0) fontWeight += ' ';
+        ctx.font = fontWeight + fontSize + 'px ' + fontFamily;
+        ctx.fillStyle = color;
+        ctx.textAlign = textAlign;
+        ctx.fillText(text, left, top);
     }
 
     /**
      * Draw border rectangle
      */
-    stroke(left, top, right, bottom, {strokeStyle = '#000000', lineWidth = 1} = {}) {
-        ctx.strokeStyle = strokeStyle;
+    stroke(left, top, right, bottom, strokeColor = '#000000', lineWidth = 1) {
+        ctx.strokeStyle = strokeColor;
         ctx.lineWidth = lineWidth;
 
         ctx.beginPath();
@@ -145,9 +154,10 @@ class Engine {
         ctx.fillRect(left, top, width, height);
 
         this.fillText(title.toUpperCase(), hCenter, vCenter - 30,
-            {font: '40px Arial', fillStyle: '#FEFC36', textAlign: 'center'});
+            {color: '#FEFC36', textAlign: 'center'},
+            {fontSize: '40'});
 
         this.fillText(msg, hCenter, vCenter + 40,
-            {fillStyle: '#FFFFFF', textAlign: 'center'});
+            {color: '#FFFFFF', textAlign: 'center'});
     }
 }
