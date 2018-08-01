@@ -9,7 +9,7 @@ function random(min, max) {
 
 const res = new Resources();
 res.addOnImagesLoadedCallback(() => {
-    // make some global variables to make access to them more comfortable
+    // make some global variables to easier access them
     this.canvasWidth = 505;
     this.canvasHeight = 606;
 
@@ -73,11 +73,7 @@ res.load([
     'img/enemy_shark_fin_revert.png',
 
     'img/fence.png',
-
-    'img/gem_blue.png',
-    'img/gem_green.png',
     'img/gem_orange.png',
-
     'img/heart.png',
     'img/heart_mini.png',
 

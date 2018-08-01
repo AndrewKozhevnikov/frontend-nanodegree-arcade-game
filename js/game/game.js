@@ -12,8 +12,8 @@ class Game {
             // new Level_1(player),
             // new Level_2(player),
             // new Level_3(player),
-            new Level_4(player)
-            // new Level_5(player)
+            // new Level_4(player),
+            new Level_5(player)
         ];
         this.currentLevel = this.allLevels[0];
 
@@ -79,6 +79,9 @@ class Game {
         }
     }
 
+    // todo start
+    // level 5 -> player does not resets
+    // after win reset player pos to 5, 2
     showWinDialog() {
         this.setPause(true);
         engine.showDialog('You Did It!', 'Press \'Enter\' to Play Again');
@@ -173,17 +176,10 @@ class Game {
 
 // choose player
 
-// player underwater fall
-// player underwater bubbles
-// underwater chars
-// msg
-// animated text
-
 // seagull animation with interpolation
 // all happy
 // flying hearts
 
 // jsdocs
-// uml
 
 // babel

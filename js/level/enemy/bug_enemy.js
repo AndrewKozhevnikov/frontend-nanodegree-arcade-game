@@ -26,13 +26,6 @@ class BugEnemy extends BaseEnemy {
         this.drawable.removeAnimation(this.jumpAnimation);
     }
 
-    // todo to remove?
-    // setCoordinates(left, top) {
-    //     super.setCoordinates(left, top);
-    //     this.beforeJumpY = this.rect.top;
-    //     this.jumpToY = this.rect.top - this.jumpHeight;
-    // }
-
     resetPosition() {
         this.removeJumpAnimation();
         super.resetPosition();

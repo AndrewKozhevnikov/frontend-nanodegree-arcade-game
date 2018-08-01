@@ -15,8 +15,10 @@ class SharkFinEnemy extends BaseEnemy {
 
         if (this.rect.left <= 0) {
             this.drawable.setImage(this.imageNormal);
+            this.runAnimation.speed = random(this.minSpeed, this.maxSpeed);
         } else if (this.rect.left + this.rect.width >= canvasWidth) {
             this.drawable.setImage(this.imageRevert);
+            this.runAnimation.speed = random(this.minSpeed, this.maxSpeed);
         }
     }
 }

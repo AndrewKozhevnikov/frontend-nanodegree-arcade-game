@@ -4,7 +4,6 @@ class Rect {
         this.top = top;
         this.width = width;
         this.height = height;
-        this.collisionScale = collisionScale;
 
         this.horizontalOffset = (width - width * collisionScale) / 2;
         this.verticalOffset = (height - height * collisionScale) / 2;

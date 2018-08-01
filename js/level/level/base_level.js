@@ -43,9 +43,13 @@ class BaseLevel {
             case 'rock':
             case 'buoyLeftAway':
             case 'buoyRightAway':
-            case 'buoyLeft':
-            case 'buoyRight':
                 obj = new LevelObject(image, left, top, false, false);
+                break;
+            case 'buoyLeft':
+                obj = new LevelObject(image, left, top - 50, false, false);
+                break;
+            case 'buoyRight':
+                obj = new LevelObject(image, left, top - 30, false, false);
                 break;
             case 'heart':
                 obj = new LevelObject(image, left, top, true, true, new Bonus({bonusLives: 1, bonusScore: 100}));
@@ -66,7 +70,7 @@ class BaseLevel {
                 // ugly
 
                 obj = new LayerLevelObject([gradient, gem], left, top, radius * 2, radius * 2,
-                    true, true, new Bonus({bonusScore: 500}));
+                    true, true, new Bonus({bonusScore: 500}), 0.6);
                 break;
             default:
                 throw new Error('Unknown LevelObject type');
@@ -74,10 +78,6 @@ class BaseLevel {
 
         return obj;
     }
-
-    // todo
-    // buoyLeft.updateRectCoordinates(buoyLeft.rect.left, buoyLeft.rect.top - 50);
-    // buoyRight.updateRectCoordinates(buoyRight.rect.left, buoyRight.rect.top - 30);
 
     resetLevelObjects() {
         for (let row = 0; row < rows; row++) {
@@ -93,7 +93,9 @@ class BaseLevel {
     }
 
     initLevel() {
-        this.player.reset(5, 2, this.isWaterLevel());
+        let row = 0;
+        let col = this.isUnderWaterLevel() ? 0 : 2;
+        this.player.reset(this, row, col);
     }
 
     initEnemies(className) {
@@ -109,6 +111,10 @@ class BaseLevel {
     }
 
     isWaterLevel() {
+        return false;
+    }
+
+    isUnderWaterLevel() {
         return false;
     }
 
@@ -130,7 +136,9 @@ class BaseLevel {
             this.checkEnemyCollisions();
         }
 
-        if (this.collideWithEnemy(this.player.rect) && game.isRunning()) {
+        if (this.player.currentState != this.player.STATE_FALLING &&
+            this.collideWithEnemy(this.player.rect) && game.isRunning()) {
+
             this.looseLife();
         }
     }
@@ -161,15 +169,18 @@ class BaseLevel {
     }
 
     looseLife() {
+        let playerCurrentState = this.player.currentState;
         this.player.setState(this.player.STATE_SAD);
         game.setGameState(game.STATE_LOOSING_LIFE);
         game.setPause(true);
 
         setTimeout(() => {
-            this.player.setState(this.player.STATE_NORMAL);
+            this.player.setState(playerCurrentState);
             game.setGameState(game.STATE_NORMAL);
             if (!game.gameLost) {
-                this.player.changePositionOnBoard(5, 2);
+                let row = 5;
+                let col = this.isUnderWaterLevel() ? 0 : 2;
+                this.player.changePositionOnBoard(row, col);
             }
             game.setPause(false);
         }, 400);
@@ -191,7 +202,7 @@ class BaseLevel {
     reset() {
         this.resetLevelObjects();
         this.allEnemies.forEach(enemy => enemy.resetPosition());
-        this.player.reset();
+        // this.player.reset(this, ); // todo does it work without row, col
         this.additionalRenderObjects = new Map();
     }
 
@@ -278,7 +289,7 @@ class BaseLevel {
         setTimeout(() => {
 
             let fadeOutTime = 1000;
-            scroll.addAnimation(new LinearAnimation(scroll.rect, 'alpha', 1, 1, 0));
+            scroll.addAnimation(new LinearAnimation(scroll, 'alpha', 1, 1, 0));
             setTimeout(() => {
                 this.additionalRenderObjects.delete('scroll');
             }, fadeOutTime);
@@ -294,9 +305,9 @@ class BaseLevel {
             40: 'down'
         };
 
-        // remove any messages if user does not want to read them
-        if (this.additionalRenderObjects.has('msg')) {
-            this.additionalRenderObjects.delete('msg');
+        if (this.player.currentState === this.player.STATE_FALLING ||
+            this.player.currentState === this.player.STATE_TALKING) {
+            return;
         }
 
         let row = this.player.row;

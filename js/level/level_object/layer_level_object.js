@@ -1,6 +1,6 @@
 class LayerLevelObject {
-    constructor(drawables, left, top, width, height, passable, collectible, bonus) {
-        this.drawable = new LayerDrawable(drawables, left, top, width, height);
+    constructor(drawables, left, top, width, height, passable, collectible, bonus, collisionRectScale) {
+        this.drawable = new LayerDrawable(drawables, left, top, width, height, collisionRectScale);
         this.passable = passable;
         this.collectible = collectible;
         this.bonus = bonus;

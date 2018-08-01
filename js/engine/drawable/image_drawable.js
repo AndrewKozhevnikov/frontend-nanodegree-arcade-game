@@ -1,12 +1,12 @@
 class ImageDrawable extends BaseDrawable {
     constructor(image, left, top, collisionRectScale = 0.6) {
         super();
-        this.setImage(image, left, top, collisionRectScale);
-    }
-
-    setImage(image, left = this.rect.left, top = this.rect.top, collisionRectScale = this.rect.collisionScale) {
         this.image = image;
         this._initRect(left, top, image.width, image.height, collisionRectScale);
+    }
+
+    setImage(image) {
+        this.image = image;
     }
 
     /**

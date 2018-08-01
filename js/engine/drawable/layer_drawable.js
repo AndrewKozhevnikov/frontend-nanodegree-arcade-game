@@ -1,9 +1,9 @@
 class LayerDrawable extends BaseDrawable {
-    constructor(drawables, left, top, width, height) {
+    constructor(drawables, left, top, width, height, collisionRectScale = 1) {
         super();
         this.drawables = drawables;
 
-        this._initRect(left, top, width, height, 0.6);
+        this._initRect(left, top, width, height, collisionRectScale);
     }
 
     update(dt) {
