@@ -5,7 +5,8 @@ class BaseLevel {
         this.rowImages = [];
         this.additionalRenderObjects = new Map();
 
-        this.initEnemies(enemyClassName);
+        let enemyCount = (this instanceof Level_6) ? 4 : 3;
+        this.initEnemies(enemyClassName, enemyCount);
 
         this.levelScheme = [
             [null, null, null, null, null],
@@ -41,6 +42,7 @@ class BaseLevel {
                 break;
             case 'fence':
             case 'rock':
+            case 'tree':
             case 'buoyLeftAway':
             case 'buoyRightAway':
                 obj = new LevelObject(image, left, top, false, false);
@@ -51,9 +53,15 @@ class BaseLevel {
             case 'buoyRight':
                 obj = new LevelObject(image, left, top - 30, false, false);
                 break;
+            case 'key':
+                obj = new LevelObject(image, left, top, true, false, null, true);
+                break;
+            case 'chest':
+                obj = new TreasureChest(image, left, top, false, false);
+                break;
             case 'heart':
                 obj = new LevelObject(image, left, top, true, true, new Bonus({bonusLives: 1, bonusScore: 100}));
-                obj.addAnimation(new ForwardBackAnimation(obj.drawable, 'scale', 0.15, 0.9, 1));
+                obj.addAnimation(new ForwardBackAnimation(obj.drawable, 'scale', 0.15, 0.7, 0.8));
                 break;
             case 'bottle':
                 obj = new LevelObject(image, left, top, true, true, new ScrollBonus({bonusScore: 100}));
@@ -93,17 +101,17 @@ class BaseLevel {
     }
 
     initLevel() {
-        let row = 0;
+        let row = this.isUnderWaterLevel() ? 0 : 5;
         let col = this.isUnderWaterLevel() ? 0 : 2;
         this.player.reset(this, row, col);
     }
 
-    initEnemies(className) {
+    initEnemies(className, enemyCount = 3) {
         let EnemyClass = EnemyFactory.getClassByName(className);
         let imageUrl = EnemyImageFactory.getImageUrl(className);
         let image = res.get(imageUrl);
 
-        for (let row = 1; row <= 3; row++) {
+        for (let row = 1; row <= enemyCount; row++) {
             let top = row * rowHeight + nextRowVisibleTop - image.height - (rowHeight - image.height) / 2;
             let enemy = new EnemyClass(image, 0, top);
             this.allEnemies.push(enemy);
@@ -136,10 +144,15 @@ class BaseLevel {
             this.checkEnemyCollisions();
         }
 
-        if (this.player.currentState != this.player.STATE_FALLING &&
-            this.collideWithEnemy(this.player.rect) && game.isRunning()) {
+        if (this.player.currentState !== this.player.STATE_FALLING && game.isRunning()) {
+            let enemy = this.getIntersectedEnemy(this.player.rect);
+            if (enemy != null) {
+                this.looseLife();
 
-            this.looseLife();
+                if (enemy instanceof SeagullEnemy) {
+                    enemy.setState(enemy.STATE_FALLING);
+                }
+            }
         }
     }
 
@@ -202,7 +215,7 @@ class BaseLevel {
     reset() {
         this.resetLevelObjects();
         this.allEnemies.forEach(enemy => enemy.resetPosition());
-        // this.player.reset(this, ); // todo does it work without row, col
+        this.player.reset(this,); // todo does it work without row, col
         this.additionalRenderObjects = new Map();
     }
 
@@ -211,14 +224,20 @@ class BaseLevel {
      *
      * @returns {boolean}
      */
-    collideWithEnemy(playerRect) {
+    getIntersectedEnemy(playerRect) {
+        let enemy;
         for (let i = 0; i < this.allEnemies.length; i++) {
-            if (playerRect.collidesWith(this.allEnemies[i].rect)) {
-                return true;
+            enemy = this.allEnemies[i];
+            if (playerRect.collidesWith(enemy.rect)) {
+                if (enemy instanceof SeagullEnemy && enemy.currentState === enemy.STATE_FALLING) {
+                    // do nothing because falling seagull cannot do harm
+                } else {
+                    return enemy;
+                }
             }
         }
 
-        return false;
+        return null;
     }
 
     canPass(row, col) {
@@ -243,19 +262,21 @@ class BaseLevel {
         return (obj != null && obj.collectible);
     }
 
+    canCarryItem(row, col) {
+        if (this.levelObjects == null) {
+            return false;
+        }
+
+        let obj = this.levelObjects[row][col];
+        return (obj != null && obj.wearable);
+    }
+
     collectItem(row, col) {
         let obj = this.levelObjects[row][col];
         let bonus = obj.bonus;
         this.levelObjects[row][col] = null;
 
         return bonus;
-    }
-
-    /**
-     * method to override
-     */
-    canWinLevel() {
-        return true;
     }
 
     /**
@@ -325,11 +346,16 @@ class BaseLevel {
                 }
                 break;
             case 'up':
-                if ((row - 1 >= 0) && this.canPass(row - 1, col)) {
+                if (this.levelObjects[row - 1][this.player.col] instanceof TreasureChest &&
+                    this.player.carriedItem != null) {
+                    this.levelObjects[row - 1][this.player.col].openChest();
+                    game.gameWon = true;
+                } else if ((row - 1 >= 0) && this.canPass(row - 1, col)) {
                     this.player.row--;
-                }
-                if (this.player.row === 0 && this.canWinLevel()) {
-                    game.winLevel();
+
+                    if (this.player.row === 0) {
+                        game.winLevel();
+                    }
                 }
                 break;
             case 'down':
@@ -351,6 +377,10 @@ class BaseLevel {
             if (bonus instanceof ScrollBonus) {
                 this.showScroll(this.player.rect.right + 10, this.player.rect.top - this.player.rect.height);
             }
+        } else if (this.canCarryItem(this.player.row, this.player.col)) {
+            let item = this.levelObjects[this.player.row][this.player.col].drawable;
+            this.levelObjects[this.player.row][this.player.col] = null;
+            this.player.carry(item);
         }
     }
 }

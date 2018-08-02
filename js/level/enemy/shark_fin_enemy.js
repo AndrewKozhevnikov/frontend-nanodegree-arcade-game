@@ -6,7 +6,7 @@ class SharkFinEnemy extends BaseEnemy {
         this.imageRevert = res.get('img/enemy_shark_fin_revert.png');
     }
 
-    getRunAnimation(speed) {
+    createRunAnimation(speed) {
         return new ForwardBackAnimation(this.rect, 'left', speed, 0, canvasWidth, -1, this.rect.width);
     }
 

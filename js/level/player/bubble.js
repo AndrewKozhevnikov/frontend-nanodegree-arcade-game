@@ -8,7 +8,7 @@ class Bubble {
 
         this.drawable = new ImageDrawable(res.get('img/bubble.png'), left, top, 1);
 
-        this.runAnimation = new LinearAnimation(this.drawable.rect, 'top', speed, top, 0);
+        this.runAnimation = new LinearAnimation(this.drawable.rect, 'top', speed, top, transparentPartOfTileImage);
         this.drawable.addAnimation(this.runAnimation);
     }
 
@@ -19,7 +19,7 @@ class Bubble {
     update(dt) {
         this.drawable.update(dt);
 
-        if (this.drawable.rect.top <= 0) {
+        if (this.drawable.rect.top <= transparentPartOfTileImage) {
             this.resetPosition();
         }
     }
@@ -30,7 +30,7 @@ class Bubble {
         let speed = random(70, 200);
 
         this.drawable.updateRectCoordinates(left, top);
-        this.runAnimation.setValues(top, 0);
+        this.runAnimation.setValues(top, transparentPartOfTileImage);
         this.runAnimation.reset();
         this.runAnimation.speed = speed;
     }

@@ -18,6 +18,8 @@ class Player {
         this.imageSad = res.get('img/char_boy_sad.png');
         let image = this.imageNormal;
 
+        this.carriedItem = null;
+
         let left = this.col * colWidth + (colWidth - image.width) / 2;
         let top = this.row * rowHeight + nextRowVisibleTop - image.height;
         this.drawable = new ImageDrawable(image, left, top);
@@ -52,8 +54,16 @@ class Player {
         return this.drawable.rect;
     }
 
+    carry(item) {
+        this.carriedItem = item;
+    }
+
     render() {
         this.drawable.render();
+
+        if (this.carriedItem != null) {
+            this.carriedItem.render();
+        }
 
         if (this.underwaterLevel) {
             this.bubbles.forEach(b => b.render());
@@ -62,6 +72,12 @@ class Player {
 
     update(dt) {
         this.drawable.update(dt);
+
+        if (this.carriedItem != null) {
+            let left = this.rect.right - 20;
+            let top = this.rect.top + this.rect.height / 2;
+            this.carriedItem.updateRectCoordinates(left, top);
+        }
 
         if (this.underwaterLevel) {
             this.bubbles.forEach(b => b.update(dt));
@@ -125,6 +141,8 @@ class Player {
         } else {
             this.setState(this.STATE_NORMAL);
         }
+
+        this.carriedItem = null;
     }
 
     /**

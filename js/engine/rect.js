@@ -26,6 +26,8 @@ class Rect {
     }
 
     collidesWith(other) {
+        // return false;
+
         if (other == null) {
             return false;
         }

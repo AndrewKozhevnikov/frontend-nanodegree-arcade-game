@@ -9,11 +9,12 @@ class Game {
         let player = new Player();
 
         this.allLevels = [
-            // new Level_1(player),
-            // new Level_2(player),
-            // new Level_3(player),
-            // new Level_4(player),
-            new Level_5(player)
+            new Level_1(player),
+            new Level_2(player),
+            new Level_3(player),
+            new Level_4(player),
+            new Level_5(player),
+            new Level_6(player)
         ];
         this.currentLevel = this.allLevels[0];
 
@@ -79,9 +80,6 @@ class Game {
         }
     }
 
-    // todo start
-    // level 5 -> player does not resets
-    // after win reset player pos to 5, 2
     showWinDialog() {
         this.setPause(true);
         engine.showDialog('You Did It!', 'Press \'Enter\' to Play Again');
@@ -94,14 +92,8 @@ class Game {
 
     winLevel() {
         this.gameStateObjects.get('score').addScore(500);
-
-        let lvl = this.gameStateObjects.get('lvl').lvl;
-        if ((lvl + 1) > this.allLevels.length) {
-            this.gameWon = true;
-        } else {
-            this.gameStateObjects.get('lvl').increaseLvl();
-            this.initLevel();
-        }
+        this.gameStateObjects.get('lvl').increaseLvl();
+        this.initLevel();
     }
 
     addBonus(bonus) {
@@ -176,7 +168,6 @@ class Game {
 
 // choose player
 
-// seagull animation with interpolation
 // all happy
 // flying hearts
 

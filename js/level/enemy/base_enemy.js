@@ -8,20 +8,27 @@
  */
 class BaseEnemy {
     constructor(image, left, top) {
-        this.drawable = new ImageDrawable(image, left, top);
-        this.minSpeed = 300;
-        this.maxSpeed = 400;
+        this.image = image;
+        this.drawable = this.createDrawable(left, top);
+        // this.minSpeed = 300;
+        // this.maxSpeed = 400;
+        this.minSpeed = 150;
+        this.maxSpeed = 300;
 
         let speed = random(this.minSpeed, this.maxSpeed);
-        this.runAnimation = this.getRunAnimation(speed);
+        this.runAnimation = this.createRunAnimation(speed);
         this.drawable.addAnimation(this.runAnimation);
+    }
+
+    createDrawable(left, top) {
+        return new ImageDrawable(this.image, left, top);
     }
 
     get rect() {
         return this.drawable.rect;
     }
 
-    getRunAnimation(speed) {
+    createRunAnimation(speed) {
         return new LinearAnimation(this.rect, 'left', speed, 0, canvasWidth);
     }
 

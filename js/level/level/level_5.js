@@ -55,12 +55,8 @@ class Level_5 extends BaseLevel {
             new SpeechBubble('Thank you.\nAnd good luck.', charsMsgLeft, charsMsgTop, false)
         ];
 
-        // todo start
         this.messageIndex = 0;
         this.showNextMessage();
-
-        // let speechBubble = new SpeechBubble(this.messages[0], 100, 100);
-        // this.additionalRenderObjects.set('speechBubble', speechBubble);
     }
 
     showNextMessage() {
@@ -80,40 +76,6 @@ class Level_5 extends BaseLevel {
 
         msg.typeText();
     }
-
-    // showNextMessage(msg) {
-    //     let textDrawable = new TextDrawable('', this.player.rect.right + 10, this.player.rect.top, {},
-    //         {fontWeight: '', fontSize: '18'});
-    //     this.additionalRenderObjects.set('text', textDrawable);
-    //
-    //     this.typeText(textDrawable, msg, () => {
-    //         setTimeout(() => {
-    //             this.additionalRenderObjects.delete('text');
-    //             if (++this.messageIndex < this.messages.length) {
-    //                 this.showNextMessage(this.messages[this.messageIndex]);
-    //             } else {
-    //                 this.player.setState(this.player.STATE_UNDERWATER);
-    //             }
-    //         }, 1000);
-    //     });
-    // }
-    //
-    // typeText(textDrawable, text, onFinishedTypingCallback) {
-    //     let i = 0;
-    //
-    //     function generateText() {
-    //         setTimeout(function () {
-    //             textDrawable.setText(textDrawable.text + text.charAt(i));
-    //             if (++i !== text.length) {
-    //                 generateText();
-    //             } else {
-    //                 onFinishedTypingCallback();
-    //             }
-    //         }, 60);
-    //     }
-    //
-    //     generateText();
-    // }
 
     isUnderWaterLevel() {
         return true;

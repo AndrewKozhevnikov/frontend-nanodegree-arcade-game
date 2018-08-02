@@ -39,10 +39,12 @@ res.load([
     'img/tile_grass.png',
     'img/tile_stone.png',
     'img/tile_water.png',
+    'img/tile_sand.png',
+    'img/tile_shore.png',
 
     'img/bottle.png',
-
     'img/bubble.png',
+    'img/submerged.png',
 
     'img/buoy_left.png',
     'img/buoy_left_away.png',
@@ -72,11 +74,21 @@ res.load([
     'img/enemy_shark_fin.png',
     'img/enemy_shark_fin_revert.png',
 
+    'img/seagull_0.png',
+    'img/seagull_1.png',
+    'img/seagull_2.png',
+    'img/seagull_3.png',
+    'img/seagull_4.png',
+    'img/seagull_5.png',
+    'img/seagull_6.png',
+    'img/seagull_7.png',
+    'img/seagull_loose_life.png',
+
     'img/fence.png',
+    'img/tree.png',
     'img/gem_orange.png',
     'img/heart.png',
     'img/heart_mini.png',
-
     'img/key.png',
     'img/octopus.png',
     'img/rock.png',
@@ -85,5 +97,6 @@ res.load([
     'img/selector.png',
     'img/star.png',
 
-    'img/submerged.png'
+    'img/treasure_chest.png',
+    'img/treasure_chest_opened.png'
 ]);

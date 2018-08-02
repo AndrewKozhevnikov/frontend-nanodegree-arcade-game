@@ -3,7 +3,8 @@ class EnemyFactory {
         this.classes = {
             BugEnemy,
             SharkFinEnemy,
-            SharkEnemy
+            SharkEnemy,
+            SeagullEnemy
         };
 
         return this.classes[name];

@@ -7,7 +7,8 @@ class BaseDrawable {
         this.scale = 1;
         this.rotateRad = 0;
         this.animations = [];
-        this.renderCollisionRect = false;
+        // this.renderCollisionRect = false;
+        this.renderCollisionRect = true;
     }
 
     // protected method
@@ -37,6 +38,7 @@ class BaseDrawable {
     }
 
     removeAnimation(animation) {
+        animation.reset();
         if (this.hasAnimation(animation)) {
             this.animations.remove(animation);
         }
