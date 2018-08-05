@@ -6,12 +6,13 @@
 * [Screenshots](#screenshots)
 * [Inspiration and Images](#inspiration-and-images)
 * [External Libs](#external-libs)
+* [Run Locally](#run-locally)
 * [Try it](#try-it)
 
 ## How The Game Works
-This is a game with 6 levels.
-The goal of the game is to reach the treasure chest, without colliding with enemies.
-Once the player reaches the first row of current level the level is won.
+This is a game with 6 levels.  
+The goal of the game is to reach the treasure chest, without colliding with enemies.  
+Once the player reaches the first row of current level the level is won.  
 Control the player with arrow keys.
 
 ## Screenshots
@@ -25,6 +26,9 @@ Control the player with arrow keys.
 
 ## External Libs
 - [easytimer.js](https://albert-gonzalez.github.io/easytimer.js/)
+
+## Run Locally
+To run the game locally - clone the repository and open index.html in your browser.
 
 ## Try it
 [Frogger Game Clone](http://AndrewKozhevnikov.github.io/frontend-nanodegree-arcade-game/)
