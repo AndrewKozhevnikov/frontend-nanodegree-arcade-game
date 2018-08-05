@@ -1,3 +1,6 @@
+/**
+ * Updates & renders sequence of sprites
+ */
 class FrameDrawable extends BaseDrawable {
     constructor(sprites, left, top, spritesChangeSpeed, collisionRectScale = 0.6) {
         super();

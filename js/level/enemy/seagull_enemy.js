@@ -50,5 +50,9 @@ class SeagullEnemy extends BaseEnemy {
         }
     }
 
-    // reset() or resetPosition
+    resetPosition() {
+        this.setState(this.STATE_NORMAL);
+
+        super.resetPosition();
+    }
 }

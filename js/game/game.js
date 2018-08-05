@@ -1,6 +1,6 @@
 class Game {
     constructor() {
-        document.addEventListener('keyup', event => this.handleInput(event.keyCode));
+        document.addEventListener('keyup', event => this.handleKeyboardInput(event.keyCode));
 
         // define constants
         this.STATE_NORMAL = 'STATE_NORMAL';
@@ -51,11 +51,6 @@ class Game {
         this.currentLevel.initLevel();
     }
 
-    /**
-     * Update game objects positions
-     *
-     * @param dt
-     */
     update(dt) {
         this.currentLevel.update(dt);
         this.gameStateObjects.forEach(obj => obj.update(dt));
@@ -67,22 +62,15 @@ class Game {
 
     /**
      * First draw all game objects.
-     * And if the game is won or lost, then show showWinDialog/showLooseDialog dialog
+     * And if the game is lost, show loose dialog
      */
     render() {
         this.currentLevel.render();
         this.gameStateObjects.forEach(obj => obj.render());
 
-        if (this.gameWon) {
-            this.showWinDialog();
-        } else if (this.gameLost) {
+        if (this.gameLost) {
             this.showLooseDialog();
         }
-    }
-
-    showWinDialog() {
-        this.setPause(true);
-        engine.showDialog('You Did It!', 'Press \'Enter\' to Play Again');
     }
 
     showLooseDialog() {
@@ -101,12 +89,6 @@ class Game {
         this.gameStateObjects.get('lives').addLives(bonus.bonusLives);
     }
 
-    /**
-     * Loose life.
-     * Change image.
-     * Set pause for 0.2 sec.
-     * After timeout resetGame to default state
-     */
     setGameState(state) {
         let lives = this.gameStateObjects.get('lives');
 
@@ -124,20 +106,18 @@ class Game {
         }
     }
 
-    /**
-     * Set paused on/off
-     */
     setPause(pause) {
         this.paused = pause;
         this.paused ? engine.stop() : engine.start();
     }
 
     /**
-     * Handle keyboard input.
+     * Handle 'enter' and 'p' keys.
+     * If another key is pressed, delegate handling to current level object
      *
      * @param keyCode
      */
-    handleInput(keyCode) {
+    handleKeyboardInput(keyCode) {
         let allowedKeys = {
             80: 'pause',
             13: 'enter'
@@ -158,19 +138,11 @@ class Game {
                 break;
             default:
                 if (this.isRunning()) {
-                    this.currentLevel.handleInput(keyCode);
+                    this.currentLevel.handleKeyboardInput(keyCode);
                 }
         }
     }
 }
 
-// todo refactor initialization and reset functions
-
-// choose player
-
-// all happy
-// flying hearts
-
-// jsdocs
-
 // babel
+// readme

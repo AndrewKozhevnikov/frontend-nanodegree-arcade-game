@@ -1,4 +1,6 @@
-// Just an empty, not passable object with no functionality at all
+/**
+ * Just an empty, not passable object with no functionality at all
+ */
 class EmptyBarrier {
     constructor() {
         this.passable = false;

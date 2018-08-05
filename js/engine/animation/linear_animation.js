@@ -1,3 +1,8 @@
+/**
+ * Allows to change any object property over time.
+ * Such object will look like it is animated.
+ * Supports only linear property change.
+ */
 class LinearAnimation {
     constructor(objectToAnimate, propertyName, speed, valueFrom, valueTo) {
         this.object = objectToAnimate;

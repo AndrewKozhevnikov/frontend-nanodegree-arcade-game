@@ -1,3 +1,7 @@
+/**
+ * Container for drawables.
+ * Can apply animation to the whole group of drawables.
+ */
 class LayerDrawable extends BaseDrawable {
     constructor(drawables, left, top, width, height, collisionRectScale = 1) {
         super();

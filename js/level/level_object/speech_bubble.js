@@ -1,3 +1,6 @@
+/**
+ * Speech bubble with animated text
+ */
 class SpeechBubble {
     constructor(text, left, top, pointingToLeft) {
         this.text = text;
@@ -44,7 +47,7 @@ class SpeechBubble {
         let right = left + width;
         let bottom = top + height;
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // todo no alpha?
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx.strokeStyle = "#969696";
         ctx.lineWidth = "2";
 

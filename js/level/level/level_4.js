@@ -25,7 +25,6 @@ class Level_4 extends BaseLevel {
     }
 
     render() {
-        this.renderTiles();
         this.callLevelObjectsMethod('render');
         this.player.render();
         this.renderWater();
@@ -55,8 +54,10 @@ class Level_4 extends BaseLevel {
         ctx.restore();
     }
 
+    /**
+     * Make far sea tiles darker
+     */
     renderFarSea() {
-        // make far sea darker
         let alpha = 0.4;
         for (let row = 0; row < rows; row++) {
             ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;

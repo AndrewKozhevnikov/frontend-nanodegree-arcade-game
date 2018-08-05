@@ -1,4 +1,7 @@
-class Bubble {
+/**
+ * Air bubble for underwater level
+ */
+class AirBubble {
     constructor(player) {
         this.player = player;
 

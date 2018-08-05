@@ -1,6 +1,13 @@
+/**
+ * Works as two combined linear animations.
+ * First change value from valueFrom to valueTo and then go back.
+ * This cycle could be repeated constantly or have several repeats.
+ */
 class ForwardBackAnimation extends LinearAnimation {
     constructor(objectToAnimate, propertyName, speed, valueFrom, valueTo, repeatCount = -1, objectSize = 0) {
         super(objectToAnimate, propertyName, speed, valueFrom, valueTo);
+
+        // if repeatCount = -1 this animation will be repeated constantly
         this.repeatCount = repeatCount;
         this.counter = 0;
         this.objectSize = objectSize;

@@ -1,3 +1,7 @@
+/**
+ * Drawable bounds.
+ * Also contains collision rect bounds
+ */
 class Rect {
     constructor(left, top, width, height, collisionScale = 1) {
         this.left = left;
@@ -26,8 +30,8 @@ class Rect {
     }
 
     collidesWith(other) {
+        // uncomment to disable collisions
         // return false;
-
         if (other == null) {
             return false;
         }

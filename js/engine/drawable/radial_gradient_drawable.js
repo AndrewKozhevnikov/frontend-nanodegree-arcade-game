@@ -1,4 +1,15 @@
+/**
+ * Renders radial gradient
+ */
 class RadialGradientDrawable extends BaseDrawable {
+    /**
+     * Constructs drawable
+     *
+     * @param rgbColor color string should be in the form: 'rgb(r, g, b)'
+     * @param left left coordinate
+     * @param top top coordinate
+     * @param radius radius
+     */
     constructor(rgbColor, left, top, radius) {
         super();
         this.rgb = this.getRGB(rgbColor);
@@ -13,6 +24,12 @@ class RadialGradientDrawable extends BaseDrawable {
         this.centerY = this.rect.top + this.radius;
     }
 
+    /**
+     * Returns color components array: [red, green, blue]
+     *
+     * @param rgbColor
+     * @returns {string[]}
+     */
     getRGB(rgbColor) {
         rgbColor = rgbColor.substring(rgbColor.indexOf('(') + 1, rgbColor.indexOf(')'));
         return rgbColor.split(",");

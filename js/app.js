@@ -7,15 +7,17 @@ function random(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// When all images are loaded - start the game
 const res = new Resources();
 res.addOnImagesLoadedCallback(() => {
-    // make some global variables to easier access them
+    // make some global variables to have easier access to them
     this.canvasWidth = 505;
     this.canvasHeight = 606;
 
     this.cols = 5;
     this.rows = 6;
 
+    // these depend on tile images
     this.transparentPartOfTileImage = 50;
     this.undergroundPartOfTileImage = 50;
 
@@ -55,16 +57,12 @@ res.load([
     'img/char_boy_happy.png',
     'img/char_boy_sad.png',
     'img/char_cat_girl.png',
-    'img/char_cat_girl_happy.png',
     'img/char_cat_girl_sad.png',
     'img/char_horn_girl.png',
-    'img/char_horn_girl_happy.png',
     'img/char_horn_girl_sad.png',
     'img/char_pink_girl.png',
-    'img/char_pink_girl_happy.png',
     'img/char_pink_girl_sad.png',
     'img/char_princess_girl.png',
-    'img/char_princess_girl_happy.png',
     'img/char_princess_girl_sad.png',
 
     'img/empty_pixel.png',
@@ -88,14 +86,12 @@ res.load([
     'img/tree.png',
     'img/gem_orange.png',
     'img/heart.png',
+    'img/heart_lives_status.png',
     'img/heart_mini.png',
     'img/key.png',
     'img/octopus.png',
     'img/rock.png',
     'img/scroll.png',
-
-    'img/selector.png',
-    'img/star.png',
 
     'img/treasure_chest.png',
     'img/treasure_chest_opened.png'

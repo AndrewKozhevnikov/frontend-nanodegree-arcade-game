@@ -1,3 +1,6 @@
+/**
+ * Renders text with stroke and fill
+ */
 class ShadowTextDrawable extends TextDrawable {
     constructor(text, left, top, strokeColor, lineWidth, fillStyle, font) {
         super(text, left, top, fillStyle, font);

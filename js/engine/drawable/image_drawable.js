@@ -1,3 +1,6 @@
+/**
+ * Renders image
+ */
 class ImageDrawable extends BaseDrawable {
     constructor(image, left, top, collisionRectScale = 0.6) {
         super();
@@ -9,10 +12,6 @@ class ImageDrawable extends BaseDrawable {
         this.image = image;
     }
 
-    /**
-     * Draw on the screen using canvas
-     * This method is a performance bottle neck
-     */
     render(parentRectLeft = 0, parentRectTop = 0) {
         ctx.globalAlpha = this.alpha;
         this.drawImage(parentRectLeft, parentRectTop);

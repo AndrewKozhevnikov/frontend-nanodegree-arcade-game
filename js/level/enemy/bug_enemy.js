@@ -4,7 +4,7 @@ class BugEnemy extends BaseEnemy {
 
         this.jumpSpeed = 70;
         this.jumpHeight = 10;
-        this.jumpAnimationTimeout = 600;
+        this.jumpAnimationTimeout = 700;
 
         this.beforeJumpY = this.rect.top;
         this.jumpToY = this.rect.top - this.jumpHeight;

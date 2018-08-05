@@ -5,8 +5,10 @@ class BaseLevel {
         this.rowImages = [];
         this.additionalRenderObjects = new Map();
 
-        let enemyCount = (this instanceof Level_6) ? 4 : 3;
-        this.initEnemies(enemyClassName, enemyCount);
+        this.enemyClassName = enemyClassName;
+        this.enemyCount = (this instanceof Level_6) ? 4 : 3;
+
+        this.showWinDialog = false;
 
         this.levelScheme = [
             [null, null, null, null, null],
@@ -74,8 +76,7 @@ class BaseLevel {
                 let gem = new ImageDrawable(image, radius - image.width / 2, radius - image.height / 2);
 
                 left = col * colWidth + (colWidth - radius * 2) / 2;
-                top = row * rowHeight + nextRowVisibleTop - radius * 2 - (rowHeight - radius * 2) / 2; // todo looks
-                // ugly
+                top = row * rowHeight + nextRowVisibleTop - radius * 2 - (rowHeight - radius * 2) / 2;
 
                 obj = new LayerLevelObject([gradient, gem], left, top, radius * 2, radius * 2,
                     true, true, new Bonus({bonusScore: 500}), 0.6);
@@ -101,9 +102,16 @@ class BaseLevel {
     }
 
     initLevel() {
+        this.renderBackground();
+
         let row = this.isUnderWaterLevel() ? 0 : 5;
         let col = this.isUnderWaterLevel() ? 0 : 2;
         this.player.reset(this, row, col);
+        this.showWinDialog = false;
+
+        if (this.allEnemies.length === 0) {
+            this.initEnemies(this.enemyClassName, this.enemyCount);
+        }
     }
 
     initEnemies(className, enemyCount = 3) {
@@ -127,11 +135,14 @@ class BaseLevel {
     }
 
     render() {
-        this.renderTiles(); //todo  move to initialization
         this.callLevelObjectsMethod('render');
         this.allEnemies.forEach(enemy => enemy.render());
         this.player.render();
         this.additionalRenderObjects.forEach(obj => obj.render());
+
+        if (this.showWinDialog) {
+            engine.showDialog('You Did It!', 'Press \'Enter\' to Play Again', false, 0.5);
+        }
     }
 
     update(dt) {
@@ -156,6 +167,8 @@ class BaseLevel {
         }
     }
 
+    // this is just an experiment of how to call method by its name
+    // todo is it ok for js coder to use such approach?
     callLevelObjectsMethod(methodName) {
         if (this.levelObjects == null) {
             return;
@@ -215,15 +228,10 @@ class BaseLevel {
     reset() {
         this.resetLevelObjects();
         this.allEnemies.forEach(enemy => enemy.resetPosition());
-        this.player.reset(this,); // todo does it work without row, col
+        this.player.reset(this);
         this.additionalRenderObjects = new Map();
     }
 
-    /**
-     * Check if player's rect collides with some enemy's rect
-     *
-     * @returns {boolean}
-     */
     getIntersectedEnemy(playerRect) {
         let enemy;
         for (let i = 0; i < this.allEnemies.length; i++) {
@@ -280,20 +288,22 @@ class BaseLevel {
     }
 
     /**
-     * Draw all currentLevel tiles
+     * Draw background on its own canvas.
+     * This method should be called only from #initLevel()
      */
-    // todo render on bg ctx
-    renderTiles() {
+    renderBackground() {
+        engine.clearBgCanvas();
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 if (this.rowImages[row] != null) {
-                    ctx.drawImage(res.get(this.rowImages[row]), col * colWidth, row * rowHeight);
+                    engine.bgCtx.drawImage(res.get(this.rowImages[row]), col * colWidth, row * rowHeight);
                 }
             }
         }
     }
 
-    showBonusText(text, left, top) {
+    showBonusFloatingText(text, left, top) {
         let bonusText = new TextDrawable(text, left, top,
             {color: '#321156', textAlign: 'center'},
             {fontWeight: 'bold', fontSize: '18'});
@@ -303,7 +313,7 @@ class BaseLevel {
         this.additionalRenderObjects.set('bonusText', bonusText);
     }
 
-    showScroll(left, top) {
+    showScrollWithText(left, top) {
         let scroll = new ImageDrawable(res.get('img/scroll.png'), left, top);
         this.additionalRenderObjects.set('scroll', scroll);
 
@@ -318,7 +328,72 @@ class BaseLevel {
         }, 3000);
     }
 
-    handleInput(keyCode) {
+    winGame() {
+        game.gameWon = true;
+        this.showWinDialog = true;
+        this.player.setState(this.player.STATE_HAPPY);
+        this.allEnemies = [];
+
+        this.showHappyChars();
+        this.showFlyingHearts();
+    }
+
+    showHappyChars() {
+        let charWidth = res.get('img/char_horn_girl.png').width;
+        let offsetX = 40;
+        let offsetY = charWidth + 20;
+        let charsDrawables = [
+            new ImageDrawable(res.get('img/char_horn_girl.png'), 0, 0),
+            new ImageDrawable(res.get('img/char_cat_girl.png'), offsetY, offsetX),
+            new ImageDrawable(res.get('img/char_pink_girl.png'), 2 * offsetY, offsetX),
+            new ImageDrawable(res.get('img/char_princess_girl.png'), 3 * offsetY, 0)
+        ];
+        let lastChar = charsDrawables[3];
+        let lastButOneChar = charsDrawables[2];
+
+        // set precise position
+        let width = lastChar.rect.right;
+        let height = lastButOneChar.rect.bottom;
+        let left = (canvasWidth - width) / 2;
+        let top = (canvasHeight - height) / 2 - 20;
+        let chars = new LayerLevelObject(charsDrawables, left, top, width, height, false, false);
+
+        let animation = new ForwardBackAnimation(chars.rect, 'top', 110, chars.rect.top, chars.rect.top - 50);
+        chars.addAnimation(animation);
+        this.additionalRenderObjects.set('chars', chars);
+    }
+
+    showFlyingHearts() {
+        let heartImage = res.get('img/heart_mini.png');
+        for (let i = 0; i < 7; i++) {
+            let left = random(50, canvasWidth - 50);
+            let top = random(50, canvasHeight - 150);
+            let speed = random(100, 200);
+            let heart = new ImageDrawable(heartImage, left, top);
+
+            let shakeAnimation = new ForwardBackAnimation(heart.rect, 'left', speed, left - 50, left + 50);
+
+            let animation = new LinearAnimation(heart.rect, 'top', speed, heart.rect.top, 0);
+            animation.setOnAnimationEndCallback(() => {
+                left = random(50, canvasWidth - 50);
+                top = random(50, canvasHeight - 150);
+                speed = random(100, 200);
+
+                shakeAnimation.setValues(left - 50, left + 50);
+
+                heart.updateRectCoordinates(left, top);
+                animation.setValues(heart.rect.top, 0);
+                animation.speed = speed;
+                animation.reset();
+            });
+            heart.addAnimation(animation);
+            heart.addAnimation(shakeAnimation);
+
+            this.additionalRenderObjects.set('heart_' + i, heart);
+        }
+    }
+
+    handleKeyboardInput(keyCode) {
         let allowedKeys = {
             37: 'left',
             38: 'up',
@@ -349,10 +424,9 @@ class BaseLevel {
                 if (this.levelObjects[row - 1][this.player.col] instanceof TreasureChest &&
                     this.player.carriedItem != null) {
                     this.levelObjects[row - 1][this.player.col].openChest();
-                    game.gameWon = true;
+                    this.winGame()
                 } else if ((row - 1 >= 0) && this.canPass(row - 1, col)) {
                     this.player.row--;
-
                     if (this.player.row === 0) {
                         game.winLevel();
                     }
@@ -372,10 +446,10 @@ class BaseLevel {
             let bonus = this.collectItem(this.player.row, this.player.col);
             game.addBonus(bonus);
 
-            this.showBonusText(bonus.getBonusText(), this.player.rect.centerX, this.player.rect.top);
+            this.showBonusFloatingText(bonus.getBonusText(), this.player.rect.centerX, this.player.rect.top);
 
             if (bonus instanceof ScrollBonus) {
-                this.showScroll(this.player.rect.right + 10, this.player.rect.top - this.player.rect.height);
+                this.showScrollWithText(this.player.rect.right + 10, this.player.rect.top - this.player.rect.height);
             }
         } else if (this.canCarryItem(this.player.row, this.player.col)) {
             let item = this.levelObjects[this.player.row][this.player.col].drawable;

@@ -23,10 +23,13 @@ class Level_6 extends BaseLevel {
     }
 
     render() {
-        this.renderTiles(); //todo  move to initialization
         this.callLevelObjectsMethod('render');
         this.player.render();
         this.allEnemies.forEach(enemy => enemy.render());
         this.additionalRenderObjects.forEach(obj => obj.render());
+
+        if (this.showWinDialog) {
+            engine.showDialog('You Did It!', 'Press \'Enter\' to Play Again', false, 0.5);
+        }
     }
 }

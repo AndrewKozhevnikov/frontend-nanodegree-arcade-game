@@ -41,12 +41,13 @@ class Player {
         this.underwaterLevel = false;
 
         this.bubbles = [
-            new Bubble(this),
-            new Bubble(this),
-            new Bubble(this),
-            new Bubble(this),
-            new Bubble(this)
+            new AirBubble(this),
+            new AirBubble(this),
+            new AirBubble(this),
+            new AirBubble(this),
+            new AirBubble(this)
         ];
+
         this.changePositionOnBoard(row, col);
     }
 
@@ -129,7 +130,7 @@ class Player {
     /**
      * Reset player to default state
      */
-    reset(level, row, col) { // todo rename
+    reset(level, row, col) {
         this.currentLevel = level;
         this.underwaterLevel = level.isUnderWaterLevel();
 
@@ -146,7 +147,7 @@ class Player {
     }
 
     /**
-     * Reset player position
+     * Set player position
      */
     changePositionOnBoard(row, col) {
         this.row = row;
