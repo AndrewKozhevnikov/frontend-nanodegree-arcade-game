@@ -167,8 +167,6 @@ class BaseLevel {
         }
     }
 
-    // this is just an experiment of how to call method by its name
-    // todo is it ok for js coder to use such approach (calling method by name)?
     callLevelObjectsMethod(methodName) {
         if (this.levelObjects == null) {
             return;

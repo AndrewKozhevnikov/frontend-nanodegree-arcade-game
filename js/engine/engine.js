@@ -105,8 +105,6 @@ class Engine {
         this.bgCtx.clearRect(0, 0, canvasWidth, canvasHeight);
     }
 
-    // todo how to make proper jsDoc for such method params?
-    // todo is it ok to use such anonymous default params? Or maybe it's better to refactor this method?
     /**
      * Stroke text
      *

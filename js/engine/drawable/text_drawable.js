@@ -11,7 +11,7 @@ class TextDrawable {
 
         this.animations = [];
 
-        this.lineHeight = 15; // todo how to calculate text height?
+        this.lineHeight = 15;
     }
 
     resetAnimations() {
