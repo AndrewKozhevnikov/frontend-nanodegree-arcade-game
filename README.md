@@ -15,7 +15,8 @@ Once the player reaches the first row of current level the level is won.
 Control the player with arrow keys.
 
 ## Screenshots
-![Alt screenshot](img/screenshots/Screenshot_1.png) ![Alt screenshot](img/screenshots/Screenshot_2.png) ![Alt screenshot] (img/screenshots/Screenshot_3.png)
+![Alt screenshot](img/screenshots/Screenshot_1.png) ![Alt screenshot](img/screenshots/Screenshot_2.png)
+![Alt screenshot](img/screenshots/Screenshot_3.png)
 
 ## Inspiration and Images
 - [inspiration and some images](https://github.com/JayBtrdgrd/frontend-nanodegree-arcade-game/)
