@@ -143,6 +143,3 @@ class Game {
         }
     }
 }
-
-// babel
-// readme
