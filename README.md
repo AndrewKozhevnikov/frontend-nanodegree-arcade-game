@@ -31,4 +31,4 @@ Control the player with arrow keys.
 To run the game locally - clone the repository and open index.html in your browser.
 
 ## Try it
-[Frogger Game Clone](http://AndrewKozhevnikov.github.io/frontend-nanodegree-arcade-game/)
+[Frogger Game Clone](http://AndyK-dev.github.io/frontend-nanodegree-arcade-game/)
